@@ -32,12 +32,47 @@ makeCY <- function(cc, year, sep = "_") {
 #'
 #' @param cyear Character vector like "255_1994"
 #' @return tibble with ccode and year
-splitCY <- function(cyear, sep = "_") {
-  tibble(cyear = cyear) %>%
-    tidyr::separate(cyear, c("ccode", "year"), remove = FALSE) %>%
-    mutate(ccode = factor(ccode, levels = sort(unique(ccode))),
-           year = as.numeric(year))
+#' Split cyear into ccode and year
+#'
+#' @param cyear Character vector like "255_1994"
+#' @return tibble with ccode (character) and year (numeric)
+splitCY <- function(cyear, sep = "_", strict = TRUE) {
+  if (!is.atomic(cyear)) stop("`splitCY()` expects a character vector, not a data frame or list.")
+
+  df <- tibble(cyear = cyear)
+
+  # Count parts safely
+  n_parts <- stringr::str_count(df$cyear %||% "", sep) + 1
+  n_parts[is.na(df$cyear)] <- NA_integer_
+  is_bad <- !is.na(n_parts) & n_parts != 2
+
+  if (strict && any(is_bad, na.rm = TRUE)) {
+    bad <- df$cyear[is_bad]
+    stop(
+      "Malformed `cyear` values in splitCY():\n",
+      paste(head(bad, 5), collapse = ", "),
+      if (length(bad) > 5) paste0(" ... [", length(bad), " total]")
+    )
+  }
+
+  # Clean return: only ccode and year
+  df_clean <- df %>%
+    dplyr::filter(!is_bad | is.na(n_parts)) %>%
+    tidyr::separate(
+      cyear, into = c("ccode", "year"),
+      sep = sep, remove = TRUE, extra = "merge", fill = "right"
+    ) %>%
+    dplyr::mutate(
+      ccode = as.character(ccode),
+      year = as.numeric(year)
+    )
+
+  return(df_clean)
 }
+
+
+
+
 
 #' Fix known problematic country-year IDs
 #'

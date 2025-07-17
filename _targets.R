@@ -28,5 +28,23 @@ list(
       path
     },
     format = "file"
+  ),
+  tar_target(
+    path_polity_csv,
+    "data/raw/p4v2014.csv",
+    format = "file"
+  ),
+  tar_target(
+    fl_polity,
+    clean_merge_polity(fl_base, path_polity_csv)
+  ),
+  tar_target(
+    fl_polity_rds,
+    {
+      path <- "data/processed/fl_polity.rds"
+      write_rds(fl_polity, path)
+      path
+    },
+    format = "file"
   )
 )
