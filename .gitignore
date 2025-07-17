@@ -1,8 +1,8 @@
 .Rproj.user
 .Rhistory
-.Rdata
+.RData
 .httr-oauth
 .DS_Store
 .quarto
-.RData
 data/processed/
+.targets/
