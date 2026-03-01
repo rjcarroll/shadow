@@ -1,0 +1,51 @@
+# Old version (reference only, not part of new repo)
+zzz-old_version/
+
+# Data files (download via scripts described in data/README.md)
+data/raw/
+data/interim/
+data/processed/
+
+# Generated outputs
+results/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+.env
+*.so
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.synctex(busy)
+*.toc
+*.ilg
+*.ind
+*.idx
+
+# macOS
+.DS_Store
