@@ -1,7 +1,7 @@
 # Civil War in the Shadow of Intervention
 
 This repository contains the data pipeline, models, and paper for an updated and
-extended version of Carroll (2021), "Civil War in the Shadow of Intervention."
+extended version an old working paper entitled _Civil War in the Shadow of Intervention_.
 
 The core argument: expectations of third-party intervention shape opposition groups'
 decisions to start a civil war. The paper builds a predictive measure of intervention
@@ -25,7 +25,7 @@ data/           Source data (not tracked; see data/README.md for downloads)
 src/shadow/     Installable Python package with data and model code
 notebooks/      Jupyter notebooks — one per pipeline stage
 tests/          pytest test suite
-paper/          LaTeX source for the paper
+paper/          Typst source for the paper
 results/        Generated figures and tables (not tracked)
 ```
 
