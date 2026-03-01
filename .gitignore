@@ -32,7 +32,10 @@ env/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# LaTeX
+# Typst compiled output (source .typ files are tracked; PDF is generated)
+paper/shadow.pdf
+
+# LaTeX leftovers (no longer used, but just in case)
 *.aux
 *.bbl
 *.blg
