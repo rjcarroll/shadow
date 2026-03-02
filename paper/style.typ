@@ -4,7 +4,7 @@
 
 #let paper(title: [], author: [], abstract: [], body) = {
 
-  set document(title: title, author: author)
+  set document(title: title, author: author.text)
 
   set page(
     paper:        "us-letter",
@@ -26,6 +26,7 @@
   )
 
   set heading(numbering: "1.")
+  set math.equation(numbering: "(1)")
 
   // Section headings
   show heading.where(level: 1): it => block(
