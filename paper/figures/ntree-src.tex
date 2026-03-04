@@ -1,0 +1,77 @@
+\documentclass[tikz, border=10pt]{standalone}
+\usepackage{tikz, amsmath}
+\usetikzlibrary{positioning}
+
+\tikzset{
+  dnode/.style={circle, draw, thin, minimum size=9mm, inner sep=0pt, font=\small},
+  tnode/.style={circle, fill=black, minimum size=4pt, inner sep=0pt},
+}
+
+\begin{document}
+\begin{tikzpicture}[font=\footnotesize, line width=0.4pt]
+
+%% ── Stage 1: onset decision ──────────────────────────────────────
+
+\node[dnode, font=\small] (O) at (0, 0) {$O$};
+
+% N branch → status quo
+\node[tnode] (sq) at (-2.2, -2.4) {};
+\node[font=\footnotesize, below=3pt of sq] {$SQ$};
+\draw (O.south west) -- node[left,  pos=0.55, inner sep=3pt] {$N$} (sq);
+
+% F branch → single dotted line dropping toward subgame center
+\draw[densely dotted, line width=0.7pt]
+    (O.south east) -- node[right, pos=0.28, inner sep=3pt] {$F$} (1.0, -4.3);
+
+%% ── Stage 2: n interveners, simultaneous ─────────────────────────
+
+\node[dnode] (I1) at (-5.4, -5.2) {$I_1$};
+\node[dnode] (I2) at (-0.5, -5.2) {$I_2$};
+\node[dnode] (In) at ( 5.4, -5.2) {$I_n$};
+
+% Ellipsis between I_2 and I_n at decision level
+\node[font=\normalsize] at (2.5, -5.2) {$\cdots$};
+
+% Information set: dashed line above I_1–I_2; broken either side of ellipsis
+\draw[dashed, line width=0.35pt]
+    ([yshift=4pt]I1.north) -- ([yshift=4pt]I2.north);
+\draw[dashed, line width=0.35pt]
+    ([yshift=4pt]I2.north east) -- ++(1.6, 0);
+\draw[dashed, line width=0.35pt]
+    ([yshift=4pt]In.north west) -- ++(-1.6, 0);
+
+%% ── Branches from I_1 ────────────────────────────────────────────
+
+\node[tnode] (I1O) at (-6.9, -7.2) {};
+\node[tnode] (I1N) at (-5.4, -7.2) {};
+\node[tnode] (I1G) at (-3.9, -7.2) {};
+
+\draw (I1) -- node[left,  pos=0.55, inner sep=2pt] {$O$} (I1O);
+\draw (I1) -- node[right, pos=0.3,  inner sep=3pt] {$N$} (I1N);
+\draw (I1) -- node[right, pos=0.55, inner sep=2pt] {$G$} (I1G);
+
+%% ── Branches from I_2 ────────────────────────────────────────────
+
+\node[tnode] (I2O) at (-2.0, -7.2) {};
+\node[tnode] (I2N) at (-0.5, -7.2) {};
+\node[tnode] (I2G) at ( 1.0, -7.2) {};
+
+\draw (I2) -- node[left,  pos=0.55, inner sep=2pt] {$O$} (I2O);
+\draw (I2) -- node[right, pos=0.3,  inner sep=3pt] {$N$} (I2N);
+\draw (I2) -- node[right, pos=0.55, inner sep=2pt] {$G$} (I2G);
+
+% Ellipsis at terminal level
+\node[font=\normalsize] at (2.5, -7.2) {$\cdots$};
+
+%% ── Branches from I_n ────────────────────────────────────────────
+
+\node[tnode] (InO) at ( 3.9, -7.2) {};
+\node[tnode] (InN) at ( 5.4, -7.2) {};
+\node[tnode] (InG) at ( 6.9, -7.2) {};
+
+\draw (In) -- node[left,  pos=0.55, inner sep=2pt] {$O$} (InO);
+\draw (In) -- node[right, pos=0.3,  inner sep=3pt] {$N$} (InN);
+\draw (In) -- node[right, pos=0.55, inner sep=2pt] {$G$} (InG);
+
+\end{tikzpicture}
+\end{document}

@@ -49,11 +49,18 @@
     #v(1.5em)
   ]
 
+  // ---- figure / table captions ----
+  show figure.caption: it => {
+    set text(size: 10pt)
+    set par(leading: 0.55em, first-line-indent: 0pt)
+    v(0.4em)
+    text(weight: "bold", it.supplement + " " + context it.counter.display() + ": ")
+    it.body
+    v(0.3em)
+  }
+
   // ---- abstract ----
-  block(
-    width:   85%,
-    inset:   (x: 0pt, y: 0pt),
-  )[
+  pad(x: 7.5%)[
     #align(center)[*Abstract*]
     #v(0.5em)
     #set par(first-line-indent: 0pt)

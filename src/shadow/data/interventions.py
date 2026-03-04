@@ -193,6 +193,46 @@ def build_intervention_table(path: Path) -> pd.DataFrame:
     return df[['ccode_A', 'ccode_B', 'year', 'target', 'ddyear']].reset_index(drop=True)
 
 
+def load_post1999_interventions(path: Path) -> pd.DataFrame:
+    """
+    Load post-1999 intervention codings from CSV.
+
+    Parameters
+    ----------
+    path : Path
+        Path to ``post1999_interventions.csv``.
+
+    Returns
+    -------
+    pd.DataFrame with same schema as :func:`build_intervention_table` output:
+        ccode_A, ccode_B, year, target, ddyear
+    """
+    df = pd.read_csv(path, comment='#')
+
+    df['ccode_A'] = cc_series(df['host_ccode'])
+    df['ccode_B'] = cc_series(df['intervener_ccode'])
+    df['year'] = df['year'].astype(int)
+    df['target'] = df['target'].astype(int)
+
+    # Apply temporal ccode validity rules
+    df['ccode_A'] = fix_ccode(df['ccode_A'], pd.Series(df['year'], index=df.index))
+    df['ccode_B'] = fix_ccode(df['ccode_B'], pd.Series(df['year'], index=df.index))
+
+    # Drop rows where either ccode resolved to NaN (e.g., state not in system)
+    df = df[df['ccode_A'].notna() & df['ccode_B'].notna()].copy()
+
+    df['ddyear'] = (
+        df['ccode_A'].astype(str) + '_' +
+        df['ccode_B'].astype(str) + '_' +
+        df['year'].astype(str)
+    )
+
+    # Deduplicate: one row per directed dyad-year
+    df = df.sort_values('ddyear').drop_duplicates(subset='ddyear', keep='first')
+
+    return df[['ccode_A', 'ccode_B', 'year', 'target', 'ddyear']].reset_index(drop=True)
+
+
 def code_interventions(dd: pd.DataFrame, int_table: pd.DataFrame) -> pd.DataFrame:
     """
     Add an ``intervention`` column to a directed-dyad DataFrame.

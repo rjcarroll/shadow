@@ -52,3 +52,9 @@ paper/shadow.pdf
 
 # macOS
 .DS_Store
+
+# Local-only directories
+readings/
+.tresorit/
+TODO/
+submissions/

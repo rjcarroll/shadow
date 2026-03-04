@@ -1,11 +1,11 @@
 // ============================================================
-// Civil War in the Shadow of Intervention
+// Fighting in the Shadow of Intervention: A Learned-Proxy Analysis
 // ============================================================
 
 #import "style.typ": *
 
 #show: paper.with(
-  title:    [Civil War in the Shadow of Intervention],
+  title:    [Fighting in the Shadow of Intervention: A Learned-Proxy Analysis],
   author:   [Robert J. Carroll],
   abstract: [
     Opposition groups decide whether to fight against a backdrop of
@@ -26,18 +26,38 @@
     intervention environment, imposing the self-consistency condition that
     equilibrium strategies be mutually coherent across potential
     interveners.  Augmenting a standard logistic model of civil war onset
-    with this measure, I find that intervention expectations improve both
-    in-sample fit and out-of-sample predictive performance, with the
-    strongest gains after the Cold War's end.
-    // TODO: update once empirical results are finalised.
+    with this measure, I find that expected government-biased intervention
+    deters onset while expected opposition-biased intervention
+    encourages it---a directional pattern that is robust across all
+    measurement draws, nine extended specifications, and a country
+    fixed-effects estimator.  The coefficient on log population---widely considered
+    the most robust correlate of civil war---attenuates by 47--83% once
+    intervention expectations are controlled for.  The shadow measure
+    completely subsumes the explanatory power of the Lake security
+    hierarchy used by @cunningham2016, confirming that the richer feature
+    set and non-superpower coverage add substantial information beyond
+    the patron-client channel alone.
   ],
 )
+
+// ── Acknowledgments ───────────────────────────────────────────────────────────
+//#heading(level: 1, numbering: none)[Acknowledgments]
+
+//This paper has benefitted from discussions with Jeff Arnold,
+//Quintin Beazer, Inken von Borzyskowski, Mike Colaresi, Tyson Chatagnier, Kevin
+//Clarke, Casey Crisman-Cox, Amanda Driscoll, Kevin Fahey, Mark Fey, Nisha Fazal,
+//Hein Goemans, Phil Henrickson, Gary Hollibaugh, Brenton Kenkel, Hye-Sung Kim,
+//Bethany Lacina, Jeff Marshall, Will Moore, Jonathan Olmsted, Kai Ou, Matt
+//Pietryka, Amy Pond, Pat Regan, Chris Reenock, Curt Signorino, Brad Smith, Mark Souva, Randy
+//Stone, Susanna Supalla, and Jaroslav Tir.  The usual caveat applies.
 
 #include "sections/introduction.typ"
 #include "sections/motivation.typ"
 #include "sections/constructing.typ"
 #include "sections/decision.typ"
 #include "sections/conclusion.typ"
+
+
 
 #bibliography("references.bib", style: "chicago-author-date")
 
