@@ -85,12 +85,3 @@ following Knox, Lucas, and Cho (2022, Section 4.2).
 ```bash
 pytest tests/
 ```
-
-## AI disclosure
-
-This project was developed extensively using Claude Code (Anthropic, Claude
-Opus 4, January--March 2026). Claude Code wrote the Python pipeline, implemented
-the statistical methods, and assisted with manuscript drafting. The author
-directed all research design decisions, coding judgments, and substantive
-interpretations. See the cover letter for full details. All code is
-deterministic and can be audited independently of its authorship.
