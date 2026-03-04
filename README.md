@@ -1,7 +1,6 @@
-# Expected Intervention and the Decision to Fight
+# Fighting in the Shadow of Intervention: A Learned-Proxy Analysis
 
-Replication archive for "Expected Intervention and the Decision to Fight:
-A Learned-Proxy Analysis."
+Replication archive for "Fighting in the Shadow of Intervention: A Learned-Proxy Analysis."
 
 Expectations of third-party military intervention shape the decision to start
 a civil war. This paper builds a learned proxy for those expectations using a
