@@ -1,0 +1,108 @@
+% ============================================================
+% Fighting in the Shadow of Intervention: A Learned-Proxy Analysis
+% ============================================================
+
+\documentclass[12pt]{article}
+
+
+% ---- Fonts ----
+%\usepackage[T1]{fontenc}
+%\usepackage{libertine}
+%\usepackage[libertine]{newtxmath}
+\usepackage[scaled=0.85]{inconsolata}
+
+% ---- Math ----
+\usepackage{amsmath}
+\let\Bbbk\relax  % resolve conflict between amssymb and newtxmath
+\usepackage{amssymb}
+
+% ---- Graphics and tables ----
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+% ---- Citations (Chicago author-date) ----
+\usepackage{natbib}
+\bibliographystyle{chicago}
+
+% ---- Cross-references ----
+\usepackage[colorlinks=true, citecolor=blue, linkcolor=red, urlcolor=blue]{hyperref}
+
+% ---- Misc ----
+\usepackage{enumitem}
+
+% ============================================================
+
+\title{Fighting in the Shadow of Intervention:\\A Learned-Proxy Analysis}
+\author{Robert J. Carroll}
+\date{\today}
+
+\begin{document}
+
+% ---- Title page ----
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+
+Theory predicts that anticipated third-party intervention shapes the
+calculus of rebellion, yet no measure of expected intervention covers
+the full population of potential interveners.  I construct one using a
+two-stage learned-proxy design: a machine-learning ensemble predicts
+the probability and direction of intervention for each directed
+dyad-year; predictions are aggregated to a country-year shadow
+disciplined by a Nash fixed-point condition.  Expected
+government-biased intervention deters onset while expected
+opposition-biased intervention encourages it.  The two shadow
+variables are jointly significant ($p < 0.001$) despite wide
+individual confidence intervals driven by inter-shadow collinearity,
+and the directional pattern is robust across specifications,
+measurement draws, and a country fixed-effects estimator.  The shadow
+subsumes two leading existing proxies and carries out-of-sample
+predictive content.
+\end{abstract}
+
+\noindent\textbf{Keywords:} civil war, military intervention, machine learning, learned proxy, onset
+
+\noindent\textbf{Word count:} 7,635
+
+\vfill
+\begin{center}
+\rule{\textwidth}{0.5pt}
+\end{center}
+
+% ---- Acknowledgments ----
+% This paper has benefitted from discussions with Jeff Arnold,
+% Quintin Beazer, Inken von Borzyskowski, Mike Colaresi, Tyson Chatagnier, Kevin
+% Clarke, Casey Crisman-Cox, Amanda Driscoll, Kevin Fahey, Mark Fey, Nisha Fazal,
+% Hein Goemans, Phil Henrickson, Gary Hollibaugh, Brenton Kenkel, Hye-Sung Kim,
+% Bethany Lacina, Jeff Marshall, Will Moore, Jonathan Olmsted, Kai Ou, Matt
+% Pietryka, Amy Pond, Pat Regan, Chris Reenock, Curt Signorino, Brad Smith,
+% Mark Souva, Randy Stone, Susanna Supalla, and Jaroslav Tir.  The usual
+% caveat applies.
+
+\clearpage
+\setcounter{page}{1}
+
+\input{sections/introduction}
+\input{sections/motivation}
+\input{sections/constructing}
+\input{sections/decision}
+\input{sections/conclusion}
+
+\bibliography{references}
+
+% ---- Online Appendix ----
+\clearpage
+\begin{center}
+\vspace{1em}
+{\Large\textbf{Online Appendix}}
+\vspace{1em}
+\end{center}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

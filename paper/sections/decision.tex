@@ -1,0 +1,292 @@
+% ============================================================
+% The Decision to Fight
+% ============================================================
+
+\section{The Decision to Fight}
+\label{sec:decision}
+
+Measure in hand, I now study whether intervention expectations affect the
+decision to initiate civil war.  The \textit{Entrants} model augments a standard
+onset logit with the two shadow variables constructed in the previous
+section:
+
+\begin{equation*}
+U_O(F; \hat{\sigma}) = \mathbf{X}\boldsymbol{\beta} + \gamma^O \sum_i \hat{\sigma}_i(O) + \gamma^G \sum_i \hat{\sigma}_i(G) + \epsilon,
+\end{equation*}
+
+\noindent where $\mathbf{X}$ contains the baseline country-year predictors and the two
+summations are the expected total number of opposition-biased and
+government-biased interveners, respectively.\footnote{In estimation, the
+summations enter through the inverse hyperbolic sine transform,
+$\operatorname{asinh}(\sum_i \hat{\sigma}_i)$, for variance stabilization.  This
+introduces a concavity---diminishing marginal returns to additional
+expected interveners---that is not implied by the theory.  Because
+$\operatorname{asinh}$ is strictly increasing, the sign of the estimated coefficients
+is invariant to this choice, and the out-of-sample model comparisons
+test whether the shadow variables improve predictions regardless of
+functional form.  The exact shape of the utility function over
+aggregated intervention expectations is not identified from these data.}
+This is the simplest
+specification of Equation~\eqref{eq:EU}, in which all potential interveners carry the same
+utility weight ($u_O^i(O) = \gamma^O$ and $u_O^i(G) = \gamma^G$ for
+all $i$).  I relax this assumption in the heterogeneous-utilities
+extensions below.
+
+The two-stage design extends the logic of statistical backwards induction
+\citep{bas2008} to an $n$-player environment.  In the two-player case, backwards
+induction estimates the second mover's choice probabilities and plugs them
+into the first mover's expected utility.  Here the intervention subgame
+involves up to 193 simultaneous movers; separability and the Nash
+fixed-point reduce the problem to one in which each intervener's marginal
+probabilities suffice, and Stage~2 recovers the opposition's utility
+parameters from their aggregate effect on onset.
+
+\subsection{Empirical Strategy}
+
+Testing these models requires a comparison point.  Following
+\citet{clarke2007}, the relevant question is not whether intervention
+expectations matter in isolation but whether a model that includes them
+outperforms one that does not.
+
+The \textit{Baseline} model serves as the rival.  It is a logistic regression
+for civil war onset using the covariate set from
+\citet{fearon2003} Table~1, Model~1---the structural
+specification the literature has converged on as a reference: prior war,
+log per capita income, log population, mountainous terrain, oil exporter
+status, new state status, political instability, ethnic and religious
+fractionalization, and democracy---estimated on our sample (COW Intra-State Wars v5.1, 1946--2014).
+This is not a replication of F\&L; it is their specification used as a
+comparison point on our data with updated sources.  Time-varying
+covariates (income, population, democracy, political instability) are
+lagged one year to avoid post-onset contamination; income and population
+come from V-Dem v15 \citep{vdem2025} and democracy from the Polity project.
+Civil war history is drawn from COW v5.1.  Slowly changing or fixed
+characteristics---terrain, ethnic and religious fractionalization,
+colonial history---are taken from the F\&L replication dataset.  To account for the mechanical growth of the summation-based
+shadow variables as the state system expands, I add a year trend to all
+specifications.
+
+\citet{cederman2010} challenge the aggregate-fractionalization
+baseline on the grounds that ethnopolitical exclusion from state power is
+the theoretically appropriate predictor.  The Coethnics extended
+specification (Section~\ref{sec:decision}) partially addresses this critique by
+interacting intervention expectations with ethnic matching between the
+intervener and the host country's population.
+
+Model comparison draws on both in-sample fit and out-of-sample
+predictive performance.  Within sample, I report the proportional
+reduction in log-loss relative to random guessing and the area under the
+ROC curve.  Out-of-sample performance uses leave-one-war-out
+cross-validation: all country-years belonging to a civil war are held
+out together, and predictions are formed from the remaining data.  This
+scheme respects temporal dependence and avoids the information leakage
+that would arise from splitting individual country-years at random.
+
+Because the Stage~1 probabilities are estimated quantities, I retain all
+25 multiply-imputed shadow measures (5 country-year imputations $\times$ 5
+directed-dyad imputations) for the uncertainty analysis described below.
+Point estimates for model-fit metrics are computed on the averaged shadow;
+coefficient standard errors account for the full spread of measurement
+draws.
+
+\subsection{Intervention Expectations and Onset}
+
+Table~\ref{tab:coefs} presents the paper's central result.  The two
+shadow variables enter with the signs the theory requires: expected
+government-biased intervention is negative ($\gamma^G = -1.62$),
+consistent with deterrence, and expected opposition-biased intervention
+is positive ($\gamma^O = +0.64$), consistent with emboldening.  This
+directional separation holds in every one of the 25 measurement draws,
+in all ten specifications reported in Table~\ref{tab:topfit}, and in the
+country fixed-effects estimator.
+
+The Entrants specification improves on the Baseline both in-sample (PRL
+from 10.1\% to 11.9\%, AUC from 0.771 to 0.787) and out-of-sample
+(OOS PRL = $+0.4\%$, OOS AUC from 0.650 to 0.672).  For a rare-event
+model with a 2\% base rate, positive OOS PRL is a demanding bar: the
+log-loss metric penalizes confident false positives severely, and the
+Baseline specification---which encodes decades of accumulated knowledge
+about structural onset risk---does not clear it.
+
+\subsubsection*{Generated-Regressor Uncertainty}
+
+Because the shadow variables are predicted from a Stage~1 classifier
+rather than directly observed, standard logistic-regression errors
+understate uncertainty.  \citet{knoxlucascho2022} show that this is the
+most common methodological failure in learned-proxy applications: of the
+48 studies they review, nearly all ignore measurement-stage variability.
+I follow their recommended $T \times P$ correction: the primary analysis
+runs separately for each of the $T = 25$ shadow measures, each is
+bootstrapped $P = 200$ times (pairs-cluster, resampling countries), and
+the resulting 5,000 coefficient vectors are pooled.
+
+The corrected standard errors in Table~\ref{tab:coefs} are roughly
+$3.5\times$ larger for $\hat{E}^G$ and $2.9\times$ larger for
+$\hat{E}^O$ than naive MLE output.  A variance decomposition shows that
+88--92\% of this total variance originates in the measurement
+stage---variation \textit{between} shadow draws---with only 8--12\% from
+primary-analysis sampling.  The measurement model, not the regression, is
+the binding source of uncertainty.
+
+Two features of the data make this unsurprising.  First, 184 onsets
+across 25 measurement draws leave the Stage~2 signal thin relative to
+variation in the learned proxy.  Second, $\hat{E}^G$ and $\hat{E}^O$ are
+correlated at $r = 0.94$: countries that attract government-biased
+intervention expectations also attract opposition-biased expectations.
+This collinearity means that small perturbations in the Stage~1
+classifier move both shadow variables together, inflating the
+between-draw variance of each coefficient.  Tested jointly, however, the
+shadow variables are unambiguous: a likelihood-ratio test rejects the
+Baseline in favor of Entrants at $p < 0.001$ (LR $= 32.7$, df $= 2$),
+and most type-disaggregated specifications reject Entrants in turn
+(Appendix~\ref{app:lr-tests}, Table~\ref{tab:lr-tests}).  The
+collinearity inflates \textit{individual} coefficient uncertainty but
+does not prevent the pair from carrying strong joint signal.  The
+consistent sign separation across all 25 draws---$\gamma^G < 0$ and
+$\gamma^O > 0$ in every one---reinforces this: the logit reliably
+separates the two effects despite having only $\approx$6\% independent
+variation to work with.
+
+Neither coefficient achieves conventional significance individually: the
+95\% confidence interval for $\gamma^G$ runs from $-4.63$ to $+0.69$
+and for $\gamma^O$ from $-1.94$ to $+2.59$.  Under the average
+monotonicity condition of \citet{knoxlucascho2022} (\S3.1)---more of the
+true intervention expectation implies more of the proxy, which the
+Stage~1 calibration diagrams verify empirically
+(Appendix~\ref{app:sl})---the signs of the coefficients are valid even
+if the magnitudes are attenuated.  The evidence for the directional
+claim therefore rests not on any single $p$-value but on the conjunction
+of three facts: both coefficients carry their theoretically predicted
+signs across all specifications and measurement draws; the shadow
+variables improve out-of-sample prediction; and the pattern survives
+country fixed effects.
+
+Restricting Stage~2 to the labeled subsample (country-years with
+observed intervention coding) yields coefficients close to the
+full-sample estimates, confirming that the results are not driven by
+out-of-sample extrapolation of the classifier
+(\citealt{knoxlucascho2022}, \S5.6).
+
+The fixed-effects specification (Column~3) absorbs all time-invariant
+confounders---terrain, ethnic composition, colonial history---and
+identifies the shadow effect from within-country temporal variation
+alone.  Both coefficients retain their signs: $\gamma^G = -1.74$
+(SE $= 0.47$), $\gamma^O = +0.87$ (SE $= 0.47$).  Only 71 of 171
+countries exhibit variation in onset and therefore contribute to
+identification.  (These standard errors are from maximum likelihood and
+do not incorporate the $T \times P$ correction; they should be
+interpreted as lower bounds on uncertainty.)
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    & Baseline & Entrants & FE Entrants \\
+    \midrule
+    Polity2\textsubscript{lag}         & $-$0.026 (0.014) & $-$0.032\textsuperscript{*} (0.014) & $-$0.043\textsuperscript{*} (0.019) \\
+    GDP/cap (log)\textsubscript{lag}   & $-$0.670\textsuperscript{***} (0.112) & $-$0.500\textsuperscript{***} (0.122) & $-$0.232 (0.270) \\
+    Pop (log)\textsubscript{lag}       & +0.110 (0.061) & +0.095 (0.066) & +0.411 (0.697) \\
+    Mountainous                        & +0.223\textsuperscript{***} (0.063) & +0.126 (0.067) & \\
+    Noncontiguous                      & +0.532\textsuperscript{*} (0.225) & +0.538\textsuperscript{*} (0.225) & \\
+    Oil                                & +0.450\textsuperscript{*} (0.203) & +0.328 (0.208) & \\
+    New state                          & +1.003\textsuperscript{**} (0.342) & +1.168\textsuperscript{**} (0.348) & +1.218\textsuperscript{**} (0.385) \\
+    Instability\textsubscript{lag}     & +0.567\textsuperscript{**} (0.180) & +0.513\textsuperscript{**} (0.179) & +0.617\textsuperscript{**} (0.196) \\
+    Prior war                          & +0.529\textsuperscript{**} (0.195) & +0.450\textsuperscript{*} (0.200) & $-$0.313 (0.203) \\
+    Ethnic frac.                       & +0.409 (0.293) & +0.562 (0.299) & \\
+    Religious frac.                    & +0.673 (0.392) & +1.225\textsuperscript{**} (0.411) & \\
+    Year                               & +0.011\textsuperscript{*} (0.005) & +0.006 (0.005) & $-$0.003 (0.019) \\
+    \midrule
+    $\hat{E}^G$ (asinh)                &        & $-$1.62 (1.37) & $-$1.74\textsuperscript{***} (0.47) \\
+    $\hat{E}^O$ (asinh)                &        & +0.64 (1.10) & +0.87 (0.47) \\
+    \midrule
+    Country FEs                        & No & No & Yes \\
+    $N$                                & 8,792 & 8,792 & 3,750 \\
+    Onsets                             & 184 & 184 & 184 \\
+    PRL                                & 10.1\% & 11.9\% & \\
+    AUC                                & 0.771 & 0.787 & \\
+    \bottomrule
+  \end{tabular}
+  \caption{Logistic regression estimates for civil war onset.  Columns~1--2
+    are pooled logit; Column~3 is conditional (fixed-effects) logit.
+    Point estimates and standard errors for the shadow variables
+    ($\hat{E}^G$, $\hat{E}^O$) in Column~2 are from a $T \times P$ bootstrap
+    following \citet{knoxlucascho2022}: $T = 25$
+    measurement-model draws $\times$ $P = 200$ pairs-cluster bootstrap
+    replications, pooling all 5,000 coefficient vectors.  This accounts
+    for uncertainty in both the Stage~1 measurement model and the Stage~2
+    primary analysis.  All other standard errors are from maximum
+    likelihood.  Column~3 standard errors do not incorporate the $T \times P$
+    correction.  Time-invariant covariates are absorbed by country fixed
+    effects in Column~3.  \textsuperscript{*}~$p < 0.05$, \textsuperscript{**}~$p < 0.01$, \textsuperscript{***}~$p < 0.001$.}
+  \label{tab:coefs}
+\end{table}
+
+\subsection{Heterogeneous Utilities}
+
+The learned-proxy approach permits a question that structural designs
+cannot easily address: which types of interveners carry disproportionate
+weight in the onset calculus?  The Entrants model constrains all
+interveners to carry the same utility weight regardless of type.  The
+theoretical framework permits the utility
+parameters to vary with intervener characteristics: setting
+$u_O^i(O) = \gamma_0^O + \gamma_P^O z_i$ and
+$u_O^i(G) = \gamma_0^G + \gamma_P^G z_i$ for some intervener attribute
+$z_i$ and aggregating produces the Entrants variables plus a pair of
+type-weighted interaction terms.  I apply this to major-power status
+(\textit{Powers}), geographic contiguity (\textit{Neighbors}), shared dominant ethnic
+group (\textit{Coethnics}), colonial relationship (\textit{Rulers}), bilateral rivalry
+(\textit{Rivals}), and military balance (\textit{DOE}).  Each type-disaggregated
+specification nests the Entrants variables.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Model & IS PRL & IS AUC & OOS PRL & OOS AUC \\
+    \midrule
+    Baseline       & 10.1\% & 0.771 & $-$1.0\% & 0.650 \\
+    Entrants       & 11.9\% & 0.787 & +0.4\%   & 0.672 \\
+    Powers         & 14.3\% & 0.809 & +1.7\%   & 0.707 \\
+    Neighbors      & 14.5\% & 0.814 & +2.4\%   & 0.710 \\
+    Coethnics      & 12.8\% & 0.798 & +0.4\%   & 0.680 \\
+    Rulers         & 11.9\% & 0.787 & $-$0.8\% & 0.668 \\
+    Rivals (bin)   & 14.4\% & 0.814 & +1.7\%   & 0.706 \\
+    Rivals (cts)   & 14.7\% & 0.820 & +2.6\%   & 0.712 \\
+    DOE            & 11.9\% & 0.788 & +0.2\%   & 0.671 \\
+    Full           & 22.3\% & 0.866 & +4.2\%   & 0.778 \\
+    \bottomrule
+  \end{tabular}
+  \caption{In-sample and out-of-sample fit across model specifications.
+    Each extended specification nests the aggregate Entrants variables.
+    IS = in-sample; OOS = leave-one-onset-group-out cross-validation.
+    PRL = proportional reduction in log-loss relative to the class-frequency null.
+    AUC = area under the ROC curve.}
+  \label{tab:topfit}
+\end{table}
+
+Six of the nine shadow-augmented specifications outperform the Baseline
+out-of-sample, with Powers, Neighbors, Rivals~(bin), and
+Rivals~(cts) achieving the largest gains (OOS PRL
+$\approx 1.7$--$2.6\%$, OOS AUC $\approx 0.71$), indicating that major
+powers, contiguous states, and hostile dyads carry disproportionate weight
+in shaping onset expectations.  The Full model achieves the highest
+discriminative ability (OOS AUC = 0.778) and is the only specification
+with OOS PRL above 4\%, though its 26-parameter specification risks
+overfitting.
+
+The shadow measure also subsumes the two most direct existing proxies for
+anticipated intervention.  On the common sample
+(6,973 country-years, 1950--2005), the Lake security hierarchy score
+from \citet{cunningham2016} adds no explanatory power beyond the shadow
+variables: the hierarchy coefficient is effectively zero
+when the Entrants variables are included (Appendix~\ref{app:cunningham},
+Figure~\ref{fig:hierarchy}).  On the 7,772 country-years where the
+\citet{gibilisco2022} structural P5 intervention probabilities are
+available, the pattern is the same: the G\&M aggregate score adds nothing
+to the Entrants specification (LR $= 0.06$, $p = 0.80$), but the shadow
+variables remain highly significant when added to a model that already
+includes the G\&M score (LR $= 26.4$, $p < 0.001$).  The learned proxy
+absorbs what both the hierarchy and the structural-game estimates
+capture, while adding variation from non-P5 interveners, bilateral
+relationships, and the spatial environment that neither alternative
+covers.

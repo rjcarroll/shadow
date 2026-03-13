@@ -1,0 +1,596 @@
+% ============================================================
+% Online Appendix
+% ============================================================
+
+\section{Regan Intervention Coding Corrections}
+\label{app:coding}
+
+The raw \citet{regan2000} data contain ten per-conflict coding decisions that are
+corrected before analysis.  These are listed in
+Table~\ref{tab:regan-corrections}.  In all cases the corrections are applied to the raw
+Stata file \textit{before} country-code standardization, matching the original R
+pipeline's order of operations.
+
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \begin{tabular}{@{}p{3cm}lp{3cm}p{4.5cm}@{}}
+    \toprule
+    \textbf{Conflict} & \textbf{State} & \textbf{Correction} & \textbf{Rationale} \\
+    \midrule
+    Congo-Brazzaville (1997) & France (220) & target: neutral $\to$ 2 (opp) & France supplied arms to Cobra militia, siding with Angola/opposition \\
+    Indonesia (1958) & USA (002) & target: gov $\to$ 2 (opp) & CIA Operation Archipelago backed anti-communist rebels \\
+    Cameroon (conflict 17) & W.\ Germany & ccode: 255 $\to$ 260 & Miscoded; correct COW code for West Germany \\
+    Congo Crisis (1960s) & All & host ccode: 484 $\to$ 490 & DRC better represents this conflict than Republic of Congo \\
+    Congo Crisis (1964) & Belgium (211) & target flipped gov$\leftrightarrow$opp & Sides effectively reversed in 1964 phase \\
+    Ethiopia (1980s) & Somalia (520) & target: gov $\to$ 2 (opp) & Somalia generally supported Ogaden opposition \\
+    Cambodia & Vietnam (816) & target: opp $\to$ 1 (gov) & Vietnam supported incumbent government throughout \\
+    Mozambique & Zimbabwe (552) & target: $\to$ 1 (gov) & Zimbabwe consistently backed FRELIMO government \\
+    Mozambique & Malawi (553) & target: $\to$ 3 (neutral) & Malawi supported both sides; excluded as neutral \\
+    Zimbabwe/South Africa & South Africa & target: $\to$ 3 (neutral) & Supported both sides; excluded \\
+    Sri Lanka & UK (200) & target: $\to$ 2 (opp) & Miscoded; correct side assignment \\
+    Sri Lanka & India (750) & target: $\to$ 1 (gov) & India supported government \\
+    Iran & Iraq (645) & target: gov $\to$ 1 & Iraq favored government; miscoded in original \\
+    \bottomrule
+  \end{tabular}
+  \caption{Regan coding corrections applied before analysis.}
+  \label{tab:regan-corrections}
+\end{table}
+
+After corrections, two directed dyads with conflicting target assignments across
+multiple records are resolved by fixing the target directly: Georgia--Russia
+(opposition-biased) and Liberia--Sierra Leone (government-biased).  Final
+deduplication retains the first record per directed dyad-year after sorting by
+the \texttt{ddyear} identifier.
+
+\subsection{Post-1999 Intervention Coding}
+\label{app:post1999}
+
+The \citet{regan2000} data end in 1999.  To extend the Stage~1 training set through 2014,
+I code military interventions in all 38 post-1999 COW onset country-years using the
+same threshold: deployment of military personnel (troops, combat advisors, or
+directed proxy forces) attributable to a specific state, on behalf of one side.
+Arms transfers, economic aid, sanctuary, and strategic direction alone are
+insufficient.  UN peacekeeping missions are excluded.  Table~\ref{tab:post1999} lists
+the 32 coded interventions; the remaining 17 onset country-years are coded as
+having no intervention meeting the threshold.  Full source notes for each
+coding decision are available in the replication archive.
+
+\begin{table}[p]
+  \centering
+  \footnotesize
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    \textbf{Host} & \textbf{Year} & \textbf{Intervener} & \textbf{Side} \\
+    \midrule
+    Sierra Leone   & 2000 & United Kingdom  & Gov. \\
+    Ivory Coast    & 2002 & France          & Gov. \\
+    Liberia        & 2002 & Guinea          & Opp. \\
+    Pakistan       & 2004 & United States   & Gov. \\
+    Chad           & 2005 & France          & Gov. \\
+    Chad           & 2005 & Sudan           & Opp. \\
+    Pakistan       & 2005 & United States   & Gov. \\
+    Somalia        & 2006 & Ethiopia        & Gov. \\
+    Chad           & 2007 & France          & Gov. \\
+    Chad           & 2007 & Sudan           & Opp. \\
+    Pakistan       & 2007 & United States   & Gov. \\
+    Somalia        & 2009 & Ethiopia        & Gov. \\
+    Iraq           & 2010 & United States   & Gov. \\
+    Ivory Coast    & 2011 & France          & Opp. \\
+    Libya          & 2011 & United States   & Opp. \\
+    Libya          & 2011 & United Kingdom  & Opp. \\
+    Libya          & 2011 & France          & Opp. \\
+    Libya          & 2011 & Qatar           & Opp. \\
+    Libya          & 2011 & UAE             & Opp. \\
+    Mali           & 2012 & France          & Gov. \\
+    Mali           & 2012 & Chad            & Gov. \\
+    Nigeria        & 2013 & Chad            & Gov. \\
+    South Sudan    & 2013 & Uganda          & Gov. \\
+    Ukraine        & 2014 & Russia          & Opp. \\
+    Somalia        & 2014 & Ethiopia        & Gov. \\
+    Somalia        & 2014 & Uganda          & Gov. \\
+    Libya          & 2014 & Egypt           & Gov. \\
+    Libya          & 2014 & UAE             & Gov. \\
+    Yemen          & 2014 & Saudi Arabia    & Gov. \\
+    Yemen          & 2014 & UAE             & Gov. \\
+    Afghanistan    & 2014 & United States   & Gov. \\
+    Afghanistan    & 2014 & United Kingdom  & Gov. \\
+    \bottomrule
+  \end{tabular}
+  \caption{Post-1999 military interventions in COW onset country-years.
+    Gov.\ = government-biased; Opp.\ = opposition-biased.}
+  \label{tab:post1999}
+\end{table}
+
+Onset country-years coded as having no military intervention meeting the
+personnel-deployment threshold: Guinea (2000), Philippines (2000, 2003, 2005),
+Burundi (2001), Rwanda (2001), Nepal (2001, 2003), Sudan (2003, 2011),
+Indonesia (2003), Yemen (2004, 2007), Sri Lanka (2006), Syria (2011),
+Myanmar (2011), and Central African Republic (2012).
+
+\section{Multiple Imputation Procedure}
+\label{app:imputation}
+
+Missing values in continuous predictors are handled through a two-stage
+multiple imputation strategy using miceforest (Multiple Imputation by Chained
+Equations with LightGBM).  The strategy generates $5 \times 5 = 25$ complete
+datasets; estimates are combined across datasets following \citet{rubin1987}.
+
+The staged structure reflects the data's own hierarchy and is a design
+choice, not a computational convenience.  Country-year quantities (GDP per
+capita, regime scores, CINC components) must be imputed at the country-year
+level: imputing them at the directed-dyad level would treat state $A$'s GDP
+as a separate quantity in each of $A$'s dyads, producing inconsistent imputed
+values across rows that share the same country and year.  Dyadic quantities
+(bilateral trade, peace scores, capital distances) must be imputed before
+directed expansion so that the symmetry constraint $x_{AB} = x_{BA}$ holds
+within each imputed dataset---a constraint that would be broken if each
+directed-dyad row were imputed independently.  Imputing in sequence,
+country-year first and undirected dyad second, preserves both requirements
+simultaneously.
+
+\textbf{Stage~1---Country-year imputation.}  The analysis sample (1946--2014, $n =
+8{,}897$ country-years) is imputed five times.  Variables imputed include
+regime scores, GDP per capita, population, oil wealth, mountainous terrain,
+ethnic fractionalization, ethnic exclusion, all six NMC capability components,
+and UN ideal points.  Six right-skewed NMC variables are asinh-transformed
+before imputation (with individually optimised scale parameters minimising the
+Kolmogorov--Smirnov statistic against the standard normal) and back-transformed
+afterwards.  Five iterations of chained equations are run.  Post-imputation
+clipping enforces substantive constraints ($-10 \leq$ \texttt{polity2} $\leq 10$,
+probabilities $\in [0,1]$, capabilities $\geq 0$).
+
+\textbf{Stage~2---Undirected-dyad imputation.}  For each of the five country-year
+datasets, the undirected dyad frame (${\sim}$599,000 rows) is imputed five times before
+expansion to directed dyads.  Imputation at the undirected-dyad stage ensures
+that symmetric quantities (trade flows, peace scores, capital distance) satisfy
+$x_{AB} = x_{BA}$ by construction within each imputed dataset.  Variables
+imputed include bilateral trade flows, peace quality scores, capital distances,
+and dispute outcome expectations.  Two iterations of chained equations are run.
+
+The 25 resulting complete datasets are processed identically through the
+spatial-weights and intervention-coding stages before combination.\footnote{%
+  The 25 branches are mutually independent at every stage upstream of the
+  final combination: each (cy, ud) pair flows from imputation through
+  Stage~1 training, Stage~1 prediction, and Stage~2 estimation without
+  reference to any other branch.  Rubin's Rules averaging is the only step
+  that requires all 25 to be complete.  This means the pipeline is
+  embarrassingly parallel---all 25 classifiers could in principle be trained
+  simultaneously---and that updating the sample in a future study would not
+  require retraining all 25 models from scratch.  A single additional
+  imputed dataset, processed through the same pipeline, contributes
+  marginally to the final combination.}
+
+\section{Variable List}
+\label{app:varlist}
+
+Table~\ref{tab:cy-vars} lists all country-year variables included in the analysis.
+Table~\ref{tab:dyad-vars} lists the dyadic variables added at the directed-dyad stage.
+
+\begin{table}[p]
+  \centering
+  \scriptsize
+  \begin{tabular}{@{}lp{5cm}ll@{}}
+    \toprule
+    \textbf{Variable} & \textbf{Description} & \textbf{Source} & \textbf{Coverage} \\
+    \midrule
+    \texttt{onset} & Civil war onset (COW types 4--5, $\geq$ 1,000 battle deaths) & COW ISW v5.1 & 1946--2014 \\
+    \texttt{polity2} & Polity II score ($-10$ to $+10$) & V-Dem v15 (\texttt{e\_polity2}) & 1946--2014 \\
+    \texttt{v2x\_polyarchy} & Electoral democracy index (0--1) & V-Dem v15 & 1946--2014 \\
+    \texttt{instab} & Political instability (large Polity swing or coup) & V-Dem v15 & 1946--2014 \\
+    \texttt{lgdp} & Log GDP per capita (2011 PPP int'l \$) & V-Dem v15 (\texttt{e\_gdppc}) & 1946--2014 \\
+    \texttt{lpop} & Log population (thousands) & V-Dem v15 / NMC v6 backup & 1946--2014 \\
+    \texttt{oil} & Oil/gas income per capita $>0$ (binary) & V-Dem v15 & 1946--2014 \\
+    \texttt{cinc} & Composite Index of National Capability & COW NMC v6 & 1946--2014 \\
+    \texttt{milex} & Military expenditure (thousands USD) & COW NMC v6 & 1946--2014 \\
+    \texttt{milper} & Military personnel (thousands) & COW NMC v6 & 1946--2014 \\
+    \texttt{major\_power} & COW major power status (binary) & COW Major Powers 2024 & 1946--2014 \\
+    \texttt{is\_P5} & UN Security Council P5 member (binary) & Coded from COW ccodes & 1946--2014 \\
+    \texttt{ideal\_point} & UNGA ideal point (liberal--conservative) & \citet{bailey2017} & 1946--2023 \\
+    \texttt{recent\_int} & Military interventions by this state in prior 5 years & \citet{regan2000} & 1946--1999 \\
+    \texttt{lmtnest} & Log(\% mountainous terrain + 1) & \citet{fearon2003} & time-invariant \\
+    \texttt{ncontig} & Non-contiguous state (islands, exclaves) & \citet{fearon2003} & time-invariant \\
+    \texttt{colbrit} & Former British colony & \citet{fearon2003} & time-invariant \\
+    \texttt{colfra} & Former French colony & \citet{fearon2003} & time-invariant \\
+    \texttt{ethfrac} & Ethnic fractionalization index (0--1) & \citet{fearon2003} & time-invariant \\
+    \texttt{eth\_excl\_frac} & Population share of excluded ethnic groups & \citet{cederman2010} & 1946--2021 \\
+    \texttt{nwstate} & New state (independent $\leq$ 2 years) & COW States 2011 & 1946--2014 \\
+    \texttt{prior\_war} & Ongoing civil war in previous year & COW ISW v5.1 & 1946--2014 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Country-year variables.}
+  \label{tab:cy-vars}
+\end{table}
+
+\begin{table}[p]
+  \centering
+  \scriptsize
+  \begin{tabular}{@{}lp{5cm}ll@{}}
+    \toprule
+    \textbf{Variable} & \textbf{Description} & \textbf{Source} & \textbf{Coverage} \\
+    \midrule
+    \texttt{ud\_defense} & Defense alliance (binary) & COW Alliances v4.1 \citep{gibler2009} & 1946--2012 \\
+    \texttt{ud\_entente} & Entente alliance (binary) & COW Alliances v4.1 & 1946--2012 \\
+    \texttt{ud\_A\_biImports} & Host's imports from intervener (millions USD) & COW Trade v4.0 & 1946--2014 \\
+    \texttt{ud\_log\_capdist} & Log capital distance (km) & COW capdist & static \\
+    \texttt{ud\_conttype} & Contiguity type (1=land, \ldots, 6=none) & COW Contiguity v3.2 \citep{stinnett2002} & 1946--2016 \\
+    \texttt{ud\_peace} & Peace quality score (0--1) & \citet{diehl2019} & 1946--2015 \\
+    \texttt{ud\_icow\_nclaims} & Number of active territorial claims & ICOW v10.1 \citep{huth2003} & 1946--2001 \\
+    \texttt{igo\_shared} & Shared full IGO memberships (count) & COW IGO v3 \citep{pevehouse2020} & 1946--2014 \\
+    \texttt{ideal\_point\_distance} & Absolute UNGA ideal-point difference & Derived from \texttt{ideal\_point} & 1946--2023 \\
+    \texttt{doe\_pr\_win\_A} & $P$(A wins bilateral dispute) & \citet{carroll2019} & 1946--2012 \\
+    \texttt{A\_wasColOf\_B} & A was a colony of B (binary) & COW coldata & static \\
+    \texttt{B\_wasColOf\_A} & B was a colony of A (binary) & COW coldata & static \\
+    \texttt{ud\_sharedColonizer} & Shared former colonizer (binary) & COW coldata & static \\
+    \texttt{ud\_sameFirstEth} & Same dominant ethnic group (binary) & Ellingsen (2000) & 1945--2002 \\
+    \texttt{log\_capratio} & Log(cinc$_B$ / cinc$_A$) capability ratio & Derived from NMC v6 & 1946--2014 \\
+    \texttt{spat\_gov} & Polity-weighted fraction of other interveners: gov-biased & Derived (see App.~\ref{app:spatial}) & 1946--1999 \\
+    \texttt{spat\_opp} & Polity-weighted fraction: opp-biased & Derived (see App.~\ref{app:spatial}) & 1946--1999 \\
+    \texttt{spat\_US\_G} & USA is gov-biased in this conflict (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_USSR\_G} & USSR/Russia is gov-biased (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_US\_O} & USA is opp-biased (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_USSR\_O} & USSR/Russia is opp-biased (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_US\_USRG} & B=USA and USSR gov-biased (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_US\_USRO} & B=USA and USSR opp-biased (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_USR\_USG} & B=USSR and USA gov-biased (binary) & Derived & 1946--1999 \\
+    \texttt{spat\_USR\_USO} & B=USSR and USA opp-biased (binary) & Derived & 1946--1999 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Directed-dyad-year variables (B = potential intervener, A = host).}
+  \label{tab:dyad-vars}
+\end{table}
+
+\section{Spatial Weights Derivation}
+\label{app:spatial}
+
+For each year $t$ in the analysis window, I construct a row-normalized
+polity-similarity weight matrix $W_t$ over the set of potential intervener
+states.  Let $p_i$ denote the Polity~II score of state $i$ in year $t$.  The
+raw weight is:
+
+\begin{equation*}
+w_{ij} = \begin{cases}
+1 / |p_i - p_j| & \text{if } p_i \neq p_j \text{ and } i \neq j, \\
+0               & \text{otherwise.}
+\end{cases}
+\end{equation*}
+
+Row-normalization gives $W_{ij} = w_{ij} / (\sum_k w_{ik})$, so that each row
+sums to 1 (rows summing to zero remain zero).  States with missing Polity scores
+are excluded from $W_t$ in that year.
+
+The polity-similarity weighting encodes the assumption that states pay more
+attention to the intervention choices of ideologically similar peers, and less
+to the choices of ideological adversaries.  This departs from the standard
+inverse-distance spatial weight used in most spatial-lag models, which would
+give \textit{higher} weight to more \textit{different} states; the similarity-based weight is
+theoretically more appropriate for the ideological-diffusion channel.
+
+Yemen (COW code 678) is excluded from the 1990 weight matrix to avoid
+anomalous results during the unification transition year.
+
+For each onset event (host country $A$, year $t$), the spatial lag for potential
+intervener $B$ is the weighted sum of other potential interveners' predicted
+intervention probabilities, with $A$ removed from the weight matrix before
+computation:
+
+\begin{equation*}
+\text{spat\_gov}_B = \sum_{\substack{j \neq A \\ j \neq B}} W_{Bj} \cdot \hat{\sigma}_j^*(1),
+\end{equation*}
+
+\noindent where $\hat{\sigma}_j^*(1)$ is the Nash equilibrium probability that state $j$
+intervenes on behalf of the government, as produced by the fixed-point iteration
+described in Section~\ref{sec:constructing}.  An analogous expression gives \texttt{spat\_opp}
+using $\hat{\sigma}_j^*(2)$.
+
+In the first training iteration (initialisation), $\hat{\sigma}_j^*(k)$ is
+replaced by the observed indicator $\mathbb{1}[y_j = k]$, where $y_j \in \{0, 1, 2\}$
+is the Regan-coded intervention outcome.  Subsequent iterations substitute the
+model's own out-of-fold predictions until convergence, at which point the lags
+are self-consistent with the predictions they condition on.
+
+\section{Stage~1 Classifier Diagnostics}
+\label{app:sl}
+
+This appendix provides the extended diagnostic output for the Stage~1
+super-learner that is summarised in the main text.  All statistics are
+out-of-fold unless stated otherwise; all figures and tables average across
+the 25 complete imputation datasets (5 country-year draws $\times$ 5 dyad draws)
+with standard deviations in parentheses or as error bars.
+
+\subsection{Component Learner Performance and Weights}
+
+Each of the nine component classifiers is trained on three feature sets:
+$X$ (dyad characteristics only, no spatial lags), $W$ (spatial lags only),
+and $XW$ (both), yielding 27 candidate models.  The NNLS stacking layer
+assigns weights to all 27 jointly.
+Table~\ref{tab:sl-components} reports out-of-fold PRL and NNLS weights
+for every learner broken out by feature set.
+Total weight by feature set: $X$ = 58.6\% (SD~8.1\%), $XW$ = 41.3\%
+(SD~8.1\%), $W$ $\approx$ 0\%.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}l rrr rrr@{}}
+    \toprule
+    & \multicolumn{3}{c}{PRL (\%)} & \multicolumn{3}{c}{NNLS weight (\%)} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+    Learner & $X$ & $W$ & $XW$ & $X$ & $W$ & $XW$ \\
+    \midrule
+    MLP (100, 50)   &  33.4 & 14.5    & 30.9 & 24.9 & 0.0 & 19.5 \\
+    Random forest   &  18.9 & $-$29.9 & 16.5 & 22.6 & 0.0 & 16.0 \\
+    HGB (lr=0.05)   &  27.3 & 16.4    & 25.6 &  7.9 & 0.0 &  3.2 \\
+    HGB (lr=0.10)   & $-$44.4 & $-$44.6 & $-$76.3 & 2.4 & 0.0 & 1.3 \\
+    MLP (25)        &   1.3 & $-$93.4 &  1.3 &  0.8 & 0.0 &  0.8 \\
+    Multinomial     &  32.7 & 16.2    & 33.8 &  0.0 & 0.0 &  0.4 \\
+    Ridge           &  33.1 & 16.3    & 34.0 &  0.0 & 0.0 &  0.1 \\
+    Elastic net     &  33.2 & 16.3    & 34.5 &  0.0 & 0.0 &  0.0 \\
+    Lasso           &  34.1 & 16.4    & 35.1 &  0.0 & 0.0 &  0.0 \\
+    \midrule
+    \textbf{Super-learner} & \multicolumn{3}{c}{\textbf{47.3}} & \multicolumn{3}{c}{\textbf{100}} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Out-of-fold PRL and NNLS weight for all 27 candidate models
+    (9 learners $\times$ 3 feature sets) and the super-learner ensemble.
+    $X$ = dyad features only; $W$ = spatial lags only; $XW$ = both.
+    All statistics average across 25 imputation draws.  Learners are
+    sorted by total weight ($X + W + XW$).}
+  \label{tab:sl-components}
+\end{table}
+
+\subsection{Calibration}
+
+Because Stage~1 probabilities are summed across approximately 190 dyads to
+form the country-year shadow measure, a calibration error of $\delta$ per dyad
+compounds to roughly $190\delta$ in the aggregate---so even small
+miscalibration matters.  Figure~\ref{fig:sl-calibration} presents reliability diagrams
+for each outcome class, pooled across all 25 imputation draws.  In each
+panel, observations are sorted by predicted probability and divided into
+10 quantile bins; the observed frequency within each bin is plotted against
+the mean prediction.  The super-learner is well calibrated across all three
+classes: points track the diagonal closely, with no systematic over- or
+under-prediction.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig-sl-calibration.pdf}
+  \caption{Reliability diagrams for each outcome class (no intervention,
+    government-biased, opposition-biased).  Each panel plots observed
+    frequency against mean predicted probability in 10 quantile bins,
+    pooled across all 25 imputation draws; the dashed diagonal represents
+    perfect calibration.  Axes are zoomed to the range where data reside.
+    Shaded histograms show the distribution of predicted probabilities.}
+  \label{fig:sl-calibration}
+\end{figure}
+
+\subsection{Fixed-Point Convergence}
+\label{app:fp}
+
+\subsubsection{The Consistency Requirement}
+
+The spatial lags \texttt{spat\_gov} and \texttt{spat\_opp} enter the Stage~1 classifier as
+predictors: they summarize how other potential interveners in the same conflict
+are behaving, weighted by ideological similarity.  But the classifier itself
+produces predicted intervention probabilities, and it is those probabilities---rather
+than the realized 0/1/2 outcomes---that should, in principle,
+enter the spatial weights.  The reason is that observed outcomes are single
+draws from mixed-strategy equilibrium probabilities; a government-biased
+intervention (outcome 1) carries no information about whether the intervening
+state was playing a pure or mixed strategy.
+
+Formally, the requirement is \textit{self-consistency}: the spatial lags fed into
+$\hat{M}$ should be the weighted sums of the probabilities that $\hat{M}$ itself
+assigns to each dyad.  Let $\hat{\mathbf{p}} = \hat{M}(\mathbf{X}(\mathbf{s}))$ be the
+vector of predicted probabilities, where $\mathbf{X}(\mathbf{s})$ denotes the
+feature matrix with spatial lags computed from $\mathbf{s}$.  Self-consistency
+requires $\mathbf{s} = W \hat{\mathbf{p}}$, a fixed-point condition.
+
+\subsubsection{Diagnosis of Non-Convergence}
+
+The main training loop (Section~\ref{sec:constructing}) runs five rounds of
+retrain-then-update, initializing $\mathbf{s}^{(0)}$ from the realized binary
+outcomes.  To assess whether five rounds are sufficient, I compute the mean
+absolute change in spatial lags between the final iteration and the
+initialization:
+
+\begin{equation*}
+\Delta = \frac{1}{n} \sum_i |s_i^{(5)} - s_i^{(0)}|.
+\end{equation*}
+
+Averaging across all onset rows and both lag channels, $\Delta \approx 0.007$
+after five iterations.  The theoretical tolerance threshold for self-consistency
+is $10^{-4}$; five iterations leave the spatial lags roughly 70 times above threshold.
+
+\subsubsection{Frozen-Model Burnout}
+
+Retraining the full super-learner is computationally expensive (${\sim}$3 hours per
+draw).  An alternative is \textit{frozen-model burnout}: after training is complete,
+hold the fitted $\hat{M}$ fixed and iterate spatial lags using its predictions
+until convergence.  Each burnout pass costs only a prediction sweep
+(milliseconds versus hours).
+
+The burnout algorithm is:
+\begin{enumerate}
+\item Initialize from the five-iteration approximation $\mathbf{s}^{(5)}$.
+\item Apply $\hat{M}$ to features $\mathbf{X}(\mathbf{s}^{(k)})$ to obtain $\hat{\mathbf{p}}^{(k)}$.
+\item Update $\mathbf{s}^{(k+1)} = W \hat{\mathbf{p}}^{(k)}$.
+\item If $\max_i |s_i^{(k+1)} - s_i^{(k)}| < \tau$, stop; otherwise go to step~2.
+\end{enumerate}
+
+The tolerance is set at $\tau = 5 \times 10^{-4}$.  This is above the
+theoretical $10^{-4}$ threshold because random-forest predictions have
+intrinsic stochasticity (different prediction calls can return slightly different
+probabilities for the same input due to tree-averaging over bootstrap samples).
+Empirical experiments confirm that $\Delta$ plateaus around $5 \times 10^{-4}$ and
+cannot be reduced further without retraining.
+
+Across all 25 imputation draws, burnout converges in 2--5 iterations (mean
+3.3), with final $\Delta$ ranging from $0.9 \times 10^{-4}$ to
+$4.7 \times 10^{-4}$---confirming that the plateau reflects irreducible
+prediction noise rather than failure to converge.  Figure~\ref{fig:fp-convergence} shows the
+convergence trajectories: all draws exhibit rapid geometric decay (roughly
+halving each iteration) before plateauing at the tolerance threshold.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fig-fp-convergence.pdf}
+  \caption{Burnout convergence across 25 imputation draws.  Lines show the
+  per-iteration trajectory of mean $|\Delta\text{spatial lag}|$ for the 13 draws with
+  full iteration histories; dots mark endpoints for the remaining 12 draws.
+  Dashed red line: convergence tolerance ($5 \times 10^{-4}$).}
+  \label{fig:fp-convergence}
+\end{figure}
+
+\subsubsection{Interpretation: Approximate Equilibrium Selection}
+
+The burnout iteration does not find an equilibrium of the underlying
+intervention game; it finds a fixed point of the \textit{fitted classifier} $\hat{M}$.
+The procedure is a nonparametric instance of the nested pseudo-likelihood
+(NPL) algorithm of \citet{aguirregabiriamira2007}: where
+A\&M iterate between estimating structural parameters and updating choice
+probabilities, the present application holds the fitted $\hat{M}$ fixed and
+iterates only the spatial lags (choice probabilities), corresponding to
+A\&M's two-step PML with a nonparametric first stage.
+These coincide with the true equilibrium only if $\hat{M}$ exactly recovers the
+true equilibrium mapping, which no finite-sample estimator can guarantee.
+
+The weaker, defensible claim is as follows.  Realized outcomes are draws from
+\textit{some} equilibrium of the underlying game---they satisfy Nash consistency by
+assumption, since they were generated by the players.  But the equilibrium
+correspondence for a game of this scale (up to 190 potential interveners, each
+choosing a mixed strategy) generically admits multiple equilibria, and different
+conflict cases may be near different connected components.  The realized binary
+outcomes provide only coarse information about which equilibrium each case is
+near: a 0/1/2 outcome is consistent with any mixed strategy that places positive
+probability on that action.
+
+The burnout iteration uses the model to extract additional information.  Given
+the realized action as a starting condition, iterating the model refines the
+estimated spatial lags toward values that are approximately consistent with the
+smooth probability distribution implied by $\hat{M}$.  In this sense, the
+iteration performs \textit{approximate equilibrium selection}: it identifies, for each
+conflict case, which region of the equilibrium correspondence the realized
+outcome is most consistent with, according to the model's learned mapping.
+
+Three caveats are important.  First, the model is trained on spatial lags
+derived from realized outcomes (the five-iteration warm start), not from the
+burnout-converged values.  Retraining on the converged values would raise a
+circularity concern: the model's weights would depend on predictions the model
+itself generated.  By freezing the model before burnout, the learned coefficients
+remain anchored to the training-time feature distribution, and the converged
+lags represent a small perturbation ($\Delta \approx 0.003$ relative to the warm
+start) rather than a wholesale shift to a foreign equilibrium.  Second, the
+equilibrium selected for each training case by the burnout need not be the same
+equilibrium that governs prediction-time cases.  The identifying assumption is
+that the equilibrium selection mechanism is stable across the sample---the same
+forces that push cases toward particular equilibria in training also govern
+unobserved cases.  Third, the burnout-converged lags are used only to compute
+the shadow measure (the country-year expectations $E_\text{gov}$ and $E_\text{opp}$ in
+Stage~2) and not to re-estimate Stage~1.  The shadow measure therefore reflects
+the approximately-equilibrium spatial environment, while the classifier's
+weights remain from training on the realized-outcome initialization.
+
+\section{Comparison with the Cunningham Hierarchy}
+\label{app:cunningham}
+
+\citet{cunningham2016} measures anticipated government-biased
+intervention using the Lake security hierarchy, a cross-sectional index of
+U.S.~patron-client relationships.  Table~\ref{tab:cunningham} merges the hierarchy
+variable with the shadow measure on the common sample (6,973 country-years,
+1950--2005, restricted to non-missing hierarchy scores) and compares four
+logistic onset models.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}lrrrl@{}}
+    \toprule
+    Model & PRL & AUC & $\hat{\beta}_\text{proxy}$ & $p$ \\
+    \midrule
+    \multicolumn{5}{@{}l}{\textit{Panel A: Lake hierarchy (6,973 CY, 1950--2005)}} \\[3pt]
+    Baseline             & 11.1\% & 0.782 & ---            & ---  \\
+    Base + Hierarchy     & 11.2\% & 0.783 & $-$0.37 (0.47) & 0.43 \\
+    Entrants             & 12.9\% & 0.796 & ---            & ---  \\
+    Entrants + Hierarchy & 12.9\% & 0.796 & +0.05 (0.46)  & 0.92 \\
+    \midrule
+    \multicolumn{5}{@{}l}{\textit{Panel B: G\&M structural P5 (7,772 CY, 1946--2014)}} \\[3pt]
+    Baseline             & 10.5\% & 0.772 & ---            & ---  \\
+    Base + G\&M          & 10.5\% & 0.773 & +0.05 (0.62)  & 0.94 \\
+    Entrants             & 12.1\% & 0.787 & ---            & ---  \\
+    Entrants + G\&M      & 12.1\% & 0.787 & +0.16 (0.63)  & 0.80 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Subsumption tests against existing intervention proxies.
+    Panel~A adds the Lake security hierarchy from
+    \citet{cunningham2016}; Panel~B adds the aggregate P5
+    intervention probability from \citet{gibilisco2022}.  Neither
+    proxy improves PRL or AUC when added to any specification, and
+    both proxy coefficients are effectively zero conditional on the
+    shadow variables.  Samples differ because the Lake hierarchy
+    covers 1950--2005 and G\&M covers 150 countries over 1950--1999.}
+  \label{tab:cunningham}
+\end{table}
+
+Neither proxy adds to the Baseline model (PRL and AUC are
+unchanged in both panels), and conditional on the shadow variables both
+coefficients are effectively zero.  The shadow measure completely
+subsumes whatever onset-relevant information these proxies contain.
+This is consistent with Figure~\ref{fig:hierarchy}: the classifier
+recovers the patron-client signal embedded in the Lake hierarchy and
+the P5 strategic-game estimates while adding substantial variation from
+non-superpower interveners, bilateral relationships, and the spatial
+environment.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fig-shadow-hierarchy.pdf}
+  \caption{$E^G$ (asinh, trimmed) versus US security hierarchy score
+    from the Lake hierarchy data used in \citet{cunningham2016}.  Each point is
+    a country-year (1950--2005); binned means show the conditional trend.
+    The correlation is positive ($r = 0.23$) and stronger post-Cold War
+    ($r = 0.35$), confirming that the classifier recovers the
+    patron-client signal while adding substantial variation from
+    non-superpower interveners.}
+  \label{fig:hierarchy}
+\end{figure}
+
+\section{Likelihood-Ratio Tests}
+\label{app:lr-tests}
+
+Table~\ref{tab:lr-tests} reports likelihood-ratio tests for the nested model
+hierarchy.  Two sets of tests are presented: each specification against the
+Baseline (do the shadow variables as a group improve fit?) and each
+type-disaggregated specification against Entrants (does type-specific
+decomposition add beyond the aggregate shadow?).
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}l rr rrrr@{}}
+    \toprule
+    & & & \multicolumn{2}{c}{vs.\ Baseline} & \multicolumn{2}{c}{vs.\ Entrants} \\
+    \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+    Model & LL & $k$ & LR & $p$ & LR & $p$ \\
+    \midrule
+    Baseline       & $-$799.5 & 13 & --- & --- & --- & --- \\
+    Entrants       & $-$783.2 & 15 & 32.7 & ${<}0.001$ & --- & --- \\
+    Powers         & $-$761.6 & 17 & 75.8 & ${<}0.001$ & 43.1 & ${<}0.001$ \\
+    Neighbors      & $-$760.0 & 17 & 79.1 & ${<}0.001$ & 46.4 & ${<}0.001$ \\
+    Coethnics      & $-$775.1 & 17 & 48.8 & ${<}0.001$ & 16.2 & ${<}0.001$ \\
+    Rulers         & $-$783.2 & 17 & 32.7 & ${<}0.001$ & 0.03 & 0.98 \\
+    Rivals (bin)   & $-$759.9 & 17 & 79.2 & ${<}0.001$ & 46.5 & ${<}0.001$ \\
+    Rivals (cts)   & $-$757.5 & 17 & 84.0 & ${<}0.001$ & 51.3 & ${<}0.001$ \\
+    DOE            & $-$782.3 & 17 & 34.4 & ${<}0.001$ & 1.8 & 0.41 \\
+    Full           & $-$690.5 & 27 & 217.9 & ${<}0.001$ & 185.3 & ${<}0.001$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Likelihood-ratio tests for nested onset specifications.
+    LL = maximized log-likelihood; $k$ = number of parameters (including
+    constant).  The ``vs.\ Baseline'' column tests whether adding shadow
+    variables improves fit (df $= k - 13$); the ``vs.\ Entrants'' column
+    tests whether type-disaggregated interactions improve on the aggregate
+    shadow (df $= k - 15$).  The shadow variables are jointly significant
+    at $p < 0.001$ in every specification.  Colonial ties (Rulers) and
+    military balance (DOE) add nothing beyond the aggregate shadow.}
+  \label{tab:lr-tests}
+\end{table}
+

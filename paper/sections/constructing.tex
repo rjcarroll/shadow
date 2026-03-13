@@ -1,0 +1,533 @@
+% ============================================================
+% A Learned Proxy for the Shadow of Intervention
+% ============================================================
+
+\section{A Learned Proxy for the Shadow of Intervention}
+\label{sec:constructing}
+
+Operationalizing the shadow requires a measure of the expected intervention
+environment at the moment a potential rebel group weighs the costs and benefits
+of open conflict.  The construction proceeds in two stages: a directed-dyad
+classifier estimates intervention probabilities for every potential
+intervener, and a country-year aggregation sums them under a Nash
+fixed-point condition ensuring self-consistency.
+
+\subsection{Outcome Variable}
+
+The Stage~1 training labels draw primarily from \citet{regan2000},
+whose dataset records third-party military, economic, and diplomatic
+interventions in civil conflicts from 1944 to 1999.  I extend Regan's coding
+through 2014 by hand-coding unambiguous military interventions in post-1999 COW
+onset country-years.  The coding threshold requires deployment of military
+personnel---troops, combat advisors, or directed proxy forces attributable to a
+specific state---on behalf of one side; arms transfers, economic aid, and
+sanctuary alone are insufficient.  UN peacekeeping missions are excluded.  The
+post-1999 extension adds 31 directed dyad-year records across 14 host countries,
+yielding a combined intervention table of 455 records (1944--2014); the full
+coding with source notes appears in Online Appendix~\ref{app:coding}.
+
+The civil war universe is drawn from the Correlates of War Intra-State War
+Dataset (v5.1) \citep{dixon2016}, restricting to wars fought for central control
+(type~4) or local/secessionist issues (type~5).  The COW threshold
+($\geq$1,000 battle deaths) is theoretically appropriate: the mechanism requires
+rebels organized enough to form rational expectations and conflicts large
+enough that outside military involvement is a realistic prospect.\footnote{%
+  At lower thresholds---such as the UCDP/PRIO $\geq$25-death criterion---third-party
+  military intervention becomes vanishingly rare, swamping any predictive signal.}
+This yields 153 distinct onset country-years between 1946 and 1999 and 191
+through 2014.  I restrict attention to \textit{military} interventions, coded as
+\textit{government-biased}~(1) or \textit{opposition-biased}~(2); corrections and
+deduplication are documented in Online Appendix~\ref{app:coding}.
+
+For each directed dyad $(B \rightarrow A)$ active in a civil war onset year, the
+training label is: 0 (no military intervention), 1 (government-biased), or 2
+(opposition-biased).  Non-onset dyad-years are excluded from the training set.
+This produces 254 intervention-coded onset observations---150 government-biased
+and 104 opposition-biased---across 51 host countries and 58 unique intervening
+states.  The five permanent Security Council members
+account for 110 of these events (43~percent); the remaining
+states---Cold War proxies, neighbors, regional patrons, and coethnics---account
+for the majority (Table~\ref{tab:interveners}).
+
+Training exclusively on onset country-years is not a convenience---it is
+the only option.  Intervention in a civil war is undefined absent a civil war;
+in non-onset years the outcome is not ``zero intervention'' but rather
+unobserved.  The consequence is that the training sample is selected on
+precisely the outcome that the Stage~2 analysis tries to explain: if the
+shadow deters onset, then high-shadow country-years are systematically
+underrepresented among onsets, and the classifier learns the
+feature--intervention mapping from an endogenously filtered sample.  There
+is no design that avoids this.  The defense rests on what the classifier
+is asked to learn.  The training target is the conditional relationship
+between \textit{dyad-level} features---alliance portfolios, capability ratios,
+colonial ties, geographic proximity, regime similarity---and the direction
+of military intervention, given that a war has started.  These bilateral
+characteristics are plausible determinants of how state $B$ behaves toward
+state $A$ in a conflict regardless of what brought that conflict about.
+The fixed-point iteration then
+handles the extrapolation: it asks what the equilibrium intervention
+environment \textit{would} look like in any country-year, including those where
+onset was never observed, without requiring that the training sample be
+representative of the full population.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}lrrr@{}} 
+    \toprule
+    State & Gov. & Opp. & Total \\
+    \midrule
+    United States\textsuperscript{\dag}   & 31 & 15 & 46 \\
+    USSR / Russia\textsuperscript{\dag}   & 16 &  7 & 23 \\
+    United Kingdom\textsuperscript{\dag}  &  9 &  8 & 17 \\
+    France\textsuperscript{\dag}          & 11 &  6 & 17 \\
+    Cuba                                  &  7 &  1 &  8 \\
+    China\textsuperscript{\dag}           &  2 &  5 &  7 \\
+    Libya                                 &  1 &  6 &  7 \\
+    Iran                                  &  2 &  5 &  7 \\
+    Somalia                               &  0 &  5 &  5 \\
+    Syria                                 &  3 &  2 &  5 \\
+    India                                 &  4 &  1 &  5 \\
+    Uganda                                &  3 &  2 &  5 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Most frequent military interveners (1946--2014); states with
+    fewer than five interventions omitted.
+    \textsuperscript{\dag}~Permanent member of the UN Security Council (P5).
+    Government-biased (Gov.)\ and opposition-biased (Opp.)\ interventions
+    are coded from the Regan \texttt{target} variable and post-1999 extension.}
+  \label{tab:interveners}
+\end{table}
+
+\subsection{Feature Set}
+
+The classifier draws on 105 directed-dyad-year features organized
+around four substantive dimensions (full list in Online Appendix~\ref{app:varlist}).
+Many variables enter twice---once for the potential intervener and
+once for the host---so that the classifier can learn asymmetric effects.
+Missing data are multiply imputed using miceforest (five country-year
+$\times$ five undirected-dyad imputations, yielding 25 complete datasets;
+Online Appendix~\ref{app:imputation}).
+
+\begin{itemize}
+\item \textbf{State characteristics of both the potential intervener and the host.}
+  Material capabilities (CINC scores and components, GDP, population) from COW
+  v6 \citep{singer1987} and V-Dem v15 \citep{vdem2025}; regime type (Polity~II and lags,
+  liberal democracy index, instability); power status (COW major power, P5
+  membership); and host-side conflict history, ethnic fractionalization
+  \citep{fearon2003}, ethnic exclusion \citep{cederman2010}, oil wealth, and terrain.
+
+\item \textbf{Bilateral ties.}  Alliance commitments \citep{gibler2009}, bilateral trade,
+  geographic proximity (log capital distance, contiguity \citealp{stinnett2002}),
+  colonial history, territorial disputes \citep{huth2003}, expected dispute outcomes
+  \citep{carroll2019}, and peace quality \citep{diehl2019}.
+
+\item \textbf{Foreign policy alignment.}  UN General Assembly ideal points
+  \citep{bailey2017} for each state and the absolute distance between them;
+  shared IGO membership from COW Dyadic IGO v3 \citep{pevehouse2020}.
+
+\item \textbf{Spatial context.}  Ten spatial lag variables constructed from a
+  row-normalized polity-similarity weight matrix capture the weighted behavior
+  of other potential interveners in the same host-year: the fraction
+  coded government- or opposition-biased, US and Soviet intervention
+  posture, and four superpower interaction terms \citep{gent2007,salehyan2007}
+  (Online Appendix~\ref{app:spatial}).
+\end{itemize}
+
+Before training, the 115 features (95 dyadic covariates + 20 spatial lags) are
+standardized and reduced via principal components analysis, retaining components
+to 90\% of cumulative variance (59--61~components across all 25 imputation
+datasets).
+
+\subsection{Classifier Design}
+
+The multinomial outcome (0 = no intervention, 1 = government-biased,
+2 = opposition-biased) is modeled using a super-learner ensemble
+\citep{vanderlaan2007}.
+
+Nine component classifiers spanning three model families are trained
+within a ten-fold cross-validation scheme: two tree ensembles (a random
+forest \citealp{breiman2001} and two histogram-based gradient boosting
+specifications at different learning rates), four logistic regression variants (ridge,
+elastic-net, lasso, and unpenalized multinomial), and two multi-layer
+perceptrons (shallow and deeper architectures).  The unpenalized
+multinomial logistic regression---a softmax best-response function---directly
+nests the functional-form assumption of structural game-theoretic models of
+intervention \citep{gibilisco2022}; its stacking weight is determined by
+out-of-fold predictive performance, so whether that assumption fits the data
+is answered empirically rather than imposed by construction.  Each
+classifier produces a vector of class probabilities for every
+training observation.  The super learner combines these using
+non-negative least squares (NNLS) weights chosen to minimize held-out
+multinomial log-loss, so that the ensemble adaptively up-weights
+component classifiers that predict well on out-of-fold observations.
+
+All reported performance statistics are based on out-of-fold
+predictions to guard against overfitting---following \citeauthor{wang2018}'s
+(\citeyear{wang2018}) demonstration that
+evaluation of class-imbalanced political-event models on training data
+produces severely inflated performance estimates \citep{muchlinski2016}.
+The primary performance metric is the proportional reduction in log-loss
+relative to the class-frequency null model (PRL); the area under the ROC
+curve (AUC) is also reported.
+
+\paragraph{Spatial lags and Nash fixed-point iteration.}
+The broader motivation for
+the two-stage design is that intervention decisions are endogenous to the
+conflict environment: interveners select into conflicts strategically, and
+a single-equation model that treats realized intervention as a covariate in
+an onset regression conflates the causal effect with the selection process
+that generated it \citep{signorino2002,gent2008}.  Qualitative evidence confirms
+the problem directly: rebel groups in Bosnia and Kosovo explicitly
+conditioned their onset decisions on anticipated outside support, so
+realized intervention is partly a consequence of expected intervention
+rather than an independent cause \citep{kuperman2008}.  Using predicted
+intervention expectations rather than realized intervention is the
+appropriate correction.
+
+The spatial context variables described in Appendix~\ref{app:spatial} depend on the
+intervention choices of \textit{other} potential interveners---quantities that are
+themselves to be predicted.  A documented pattern of countervailing
+intervention makes these dependencies quantitatively important: when one
+state intervenes on the government side, ideologically rival states face a
+selective incentive to support the opposition, and vice versa \citep{salehyan2011,findleyteo2006}.
+\citet{aydinregan2011} confirm that these
+network effects are consequential: opposing interventions nearly double civil
+war duration, while same-side interventions shorten wars only when the
+intervening states share similar foreign policy preferences---evidence that
+the strategic alignment among interveners, not merely their count, carries
+the signal.  This creates a concrete measurement problem.
+Without an explicit consistency requirement, spatial lags are computed
+from \textit{observed} training-data intervention choices, which are not the
+model's own outputs.  Applied out-of-sample---to country-years unlike
+the training-period equilibrium---the predictions embed a deterministic
+discrepancy between lag inputs and probability outputs whose sign and
+magnitude depend on how far the out-of-sample world departs from
+training-period behavior.  This is systematic error, not sampling noise,
+and in a measure designed to capture counterfactual intervention
+environments the bias could be large.
+
+The fix is to require that the predictions be self-consistent inputs to
+themselves:
+
+\begin{equation}
+\sigma^*(B, A, t) = \hat{M}(X(B, A, t, \sigma^*)) \quad \forall\, (B, A, t),
+\label{eq:fp}
+\end{equation}
+
+\noindent where $\hat{M}$ is the trained super-learner classifier.  At $\sigma^*$,
+the spatial lags are derived from the model's own equilibrium predictions,
+not from historical observations.
+The deterministic discrepancy disappears by construction.
+
+This self-consistency condition is also the Nash equilibrium condition
+for a natural class of games.  The primitive object is the best-response
+correspondence, not the game itself: a game specifies a best-response
+correspondence \textit{derivatively}, via utility maximization; $\hat{M}$ specifies
+one \textit{directly}, from the data.  Nash equilibrium is a fixed point of
+the best-response correspondence and does not require identifying the
+payoff functions that generate it.  Games can be partitioned into
+equivalence classes under the relation ``generates the same best-response
+correspondence''; $\sigma^*$ is the Nash equilibrium of every game in the
+class whose correspondence $\hat{M}$ estimates.\footnote{%
+  The set of rationalizing payoff functions for any interior $\sigma^*$
+  is non-empty---choose utilities that make each player indifferent among
+  actions assigned positive probability.  What is identified is the
+  correspondence; the payoffs that generate it are not.  A natural
+  parametric fiber of these classes is the linear-utility family
+  $u_i(a, \sigma_{-i}) = \alpha \cdot f_i(a) + \beta \cdot W_i(a, \sigma_{-i})$,
+  where $f_i$ captures state-specific intervention incentives and $W_i$
+  the spatial interaction term.  The best-response from this family is a
+  softmax---the functional form of the multinomial logit component of
+  the super-learner---so the parametric case is explicitly represented
+  in the ensemble while the broader non-parametric mixture accommodates
+  departures from it.  The iterative procedure that solves Equation~\eqref{eq:fp}
+  is the nonparametric analogue of the nested pseudo-likelihood (NPL) algorithm
+  of \citet{aguirregabiriamira2007}: the fitted
+  super-learner replaces the parametric best-response function,
+  and the fixed-point iteration updates beliefs (spatial lags) until
+  self-consistency, as in A\&M's two-step PML.  In the parametric case,
+  \citet{crismancox2021} show that this class of
+  iterative estimators substantially outperforms direct maximum likelihood
+  estimation of strategic games under equilibrium multiplicity.
+  Uniqueness of the fixed point is not guaranteed in general, but
+  convergence is rapid (two to three passes across all 25 imputation
+  draws), consistent with a contractive mapping.}
+If the training data reflect equilibrium play and the spatial lags are
+sufficient statistics for the strategically relevant information in
+$\sigma_{-i}$, then $\hat{M}$ is a non-parametric estimate of the true
+best-response correspondence $\mathrm{BR}^*$ and $\sigma^*$ estimates its fixed
+point, without specifying which game in the equivalence class is the
+true data-generating process.  The statistical
+and game-theoretic justifications therefore coincide: Equation~\eqref{eq:fp} corrects a
+concrete measurement error and simultaneously identifies the equilibrium
+of the underlying intervention game, whichever member of the equivalence
+class that game happens to be.
+
+Equation~\eqref{eq:fp} has no closed form but is solved by fixed-point iteration.
+The iteration proceeds in two stages.  In the \textit{training stage}, the
+classifier is first fit using observed spatial lags; out-of-fold predictions
+then replace the observed intervention indicators to recompute spatial lags;
+and the classifier is refit on the updated lags.  This loop repeats until
+convergence, typically within two to three passes.  In the \textit{prediction
+stage}, the trained classifier is held fixed and only the spatial lags are
+updated: the model predicts for every directed dyad-year (onset and non-onset
+alike), spatial lags are recomputed from those predictions, and the model
+re-predicts until convergence.  Applying the fixed-point universally---not just to onset rows---ensures
+that the shadow reflects the counterfactual equilibrium in any country-year,
+including those where no conflict was observed.
+
+\subsection{Predictive Performance}
+
+Table~\ref{tab:stage1-perf} reports out-of-fold performance for the super-learner
+and two selected components: the lasso logistic regression (the best single
+component by standalone PRL) and the random forest (which despite lower standalone
+PRL receives the second-highest NNLS weight at 38.6\%, reflecting complementary
+predictive information).  Full results for all nine component learners appear in
+Appendix~\ref{app:sl}, Table~\ref{tab:sl-components}.  All statistics average
+across the 25 complete datasets, with standard deviations across imputation draws
+in parentheses.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    Model & PRL & AUC (macro) & Log-loss \\
+    \midrule
+    Super-learner       & 47.3\% (1.0\%) & 0.969 (0.003) & 0.033 (0.001) \\
+    MLP (100, 50)       & 33.4\% (4.4\%) & 0.940 (0.014) & 0.041 (0.003) \\
+    Lasso logit         & 35.1\% (1.0\%) & 0.957 (0.003) & 0.040 (0.001) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Selected Stage~1 classifier performance (out-of-fold, 25 imputation
+    draws).  The MLP is the highest-weighted component (44.5\% of the ensemble);
+    lasso logit is the best parametric model.  Standard deviations across draws
+    in parentheses.  The class-frequency null has PRL~$=$~0\% by construction,
+    AUC~$=$~0.500, and log-loss~$=$~0.062.  Full results for all nine component
+    learners appear in Table~\ref{tab:sl-components}.}
+  \label{tab:stage1-perf}
+\end{table}
+
+The ensemble achieves a PRL of 47.3\% and a macro-average AUC of 0.969.
+A PRL near 47\% indicates that the classifier recovers nearly half the
+information in intervention outcomes that the class-frequency null
+discards---a substantial figure for a three-class rare-event problem
+in which the modal outcome (no intervention) accounts for over 99\% of
+observations.  Interventions account for barely one percent of
+directed-dyad-year observations, so the predictive task is a
+needle-in-a-haystack problem.  A natural question is whether the
+classifier earns its performance by finding the needles---correctly
+identifying the rare dyad-years where intervention occurs---or by
+calibrating the hay, sharpening predictions for the overwhelming
+non-intervention majority.  The distinction is consequential: a model
+that only improved its calibration of non-events would replicate what
+any onset regression without shadow variables already does implicitly,
+sending all intervention probabilities to their unconditional near-zero
+rate.  What the shadow measure requires is discrimination among rare
+events.  Decomposing the log-loss reduction by true class confirms that
+the classifier delivers exactly this: 94 percent of the PRL originates
+from the 1.0 percent of observations where intervention actually
+occurred, with only 6 percent from improved calibration of
+non-events.
+
+The result also speaks directly to the rational expectations assumption
+embedded in the theoretical model.  The classifier is trained entirely on
+publicly observable state characteristics---material capabilities, alliance
+portfolios, regime type, colonial history, foreign policy alignment.  If an
+estimator operating on this strict subset of information recovers 47\% of
+the predictive content in realized intervention outcomes, then intervention
+is, to a substantial degree, foreseeable from information available to any
+careful observer.  Under rational expectations, agents exploit available
+information at least as well as the analyst's model \citep{muth1961}; rebel
+leaderships can additionally draw on private intelligence, direct
+communications with potential patron states, diaspora networks, and
+on-the-ground assessments of great power intentions that no dataset records.
+The 47\% figure is accordingly a lower bound on how knowable the
+intervention environment is from the rebel's perspective, not a ceiling.
+
+The performance gap between the ensemble and the best single logistic
+specification---47.3\% vs 35.2\% PRL on an identical feature set---reveals
+nonlinear and interactive structure that parametric models cannot fully recover.
+\citet{moruccispirling2024} show that in typical political science applications,
+complex models rarely outperform logistic regression because curated feature
+sets lack exploitable nonlinear structure; the intervention prediction task
+is an exception, precisely because the broad feature space is designed for
+measurement rather than theory testing.  The NNLS
+stacking procedure quantifies this directly: it assigns near-zero weight to all
+four logistic specifications (ridge, lasso, elastic-net, unpenalized
+multinomial), concentrating ensemble mass on the deep multi-layer perceptron
+(44.5\%) and the random forest (38.6\%), with a gradient-boosted ensemble
+taking 11.1\% (Appendix~\ref{app:sl}, Table~\ref{tab:sl-components}).
+Notably, the logistic family achieves the highest standalone PRL among
+individual learners yet receives negligible ensemble weight, indicating that
+the nonlinear learners subsume their predictive content while adding
+complementary information the logistic models miss.
+Because the logistic family is
+explicitly included in the candidate library and explicitly down-weighted by
+the data, the ensemble's superiority is not an artifact of architecture choice.
+
+Because Stage~1 probabilities are subsequently summed across approximately
+190 potential interveners, systematic miscalibration compounds; reliability
+diagrams confirming calibration for each outcome class appear in Appendix~\ref{app:sl}.
+These diagnostics follow \citeauthor{knoxlucascho2022}'s (\citeyear{knoxlucascho2022}) recommendation to ``always
+assess and report measurement performance'' (their \S5.4): the PRL and AUC
+quantify predictive accuracy, and the reliability diagrams verify the
+calibration assumptions on which the aggregation to country-year
+expectations depends.
+
+\subsection{Aggregating to Country-Year Intervention Expectations}
+
+The Stage~1 classifier produces, for each directed dyad $(B \rightarrow A)$
+in a civil war onset country-year, probability estimates
+$\hat{\sigma}_B(1)$ and $\hat{\sigma}_B(2)$ for government- and
+opposition-biased intervention, respectively.  To reduce noise from
+potential interveners to whom the classifier assigns negligible
+probability, I apply a cutpoint filter: intervener $B$ contributes to
+the aggregate only if $\hat{\sigma}_B(k) \geq \tau$ for $k \in \{1, 2\}$.
+The threshold $\tau$ is treated as a tuning parameter and selected by
+out-of-fold performance in the Stage~2 onset models; in practice,
+$\tau = 0.001$ performs best, excluding only the very least likely
+interveners.  The threshold is permissive by design: the PRL
+decomposition above shows that the classifier's information content
+concentrates overwhelmingly in the rare dyads it flags as plausible
+interveners, so the cutpoint discards noise from the long tail of
+near-zero predictions while preserving essentially all of the signal.
+
+The aggregate intervention-expectation variables for host country $A$ in
+year $t$ are
+
+\begin{equation*}
+E_A^G(t) = \sum_{B:\, \hat{\sigma}_B(1) \geq \tau} \hat{\sigma}_B(1), \quad
+E_A^O(t) = \sum_{B:\, \hat{\sigma}_B(2) \geq \tau} \hat{\sigma}_B(2).
+\end{equation*}
+
+Both sums are mechanically larger in later years as the system expands.
+I include a year trend in all second-stage regressions to absorb this
+secular growth.  The sums are also right-skewed; following
+\citet{burbidge1988}, I apply the inverse hyperbolic sine (asinh)
+transformation before entering them into the onset models.
+
+\subsection{Properties of the Shadow Measure}
+\label{sec:shadow-properties}
+
+Before turning to the onset analysis, I examine the descriptive properties
+of $E^G$ and $E^O$ to establish that they behave as the theory predicts.
+
+The dyad-level predictions reveal a structural asymmetry between the two
+sides of intervention.  The highest predicted probabilities of
+government-biased intervention involve superpowers projecting influence into
+client states---the United States supporting the Philippines in 1972
+($\hat{p}_\text{gov} = 0.81$), Laos in 1968, Cambodia in 1972.  For
+opposition-biased intervention, the picture shifts: the maximum is Somalia
+opposing the Ethiopian government in 1980 ($\hat{p}_\text{opp} = 0.77$), followed
+closely by Bulgaria targeting Greece in 1947 and Libya targeting Chad in 1984,
+and all ten of the highest-ranked opposition predictions involve non-P5
+interveners.  A measurement framework restricted to P5 states
+would miss the majority of the opposition-biased shadow.
+
+Table~\ref{tab:shadow-dyads} makes this concrete for three canonical onsets, reporting
+the five states to which the classifier assigns the highest government- and
+opposition-biased intervention probabilities alongside an indicator of whether
+the state actually intervened in that direction.
+
+\begin{table}[t]
+  \centering
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lr c @{\quad} lr c@{}}
+    \toprule
+    \textbf{Gov-biased} & $\hat{p}$ & & \textbf{Opp-biased} & $\hat{p}$ & \\
+    \midrule
+    \multicolumn{6}{c}{\textbf{Angola (1976) --- 5 actual interventions}} \\
+    \cmidrule(lr){1-6}
+    USSR$^\ast$          & .20 & $\checkmark$ & Zaire              & .49 &              \\
+    Cuba                 & .18 & $\checkmark$ & South Africa       & .19 & $\checkmark$ \\
+    United States$^\ast$ & .15 &              & United States$^\ast$ & .04 & $\checkmark$ \\
+    Zambia               & .07 &              & Portugal           & .03 &              \\
+    Portugal             & .05 &              & USSR$^\ast$        & .02 &              \\
+    \addlinespace
+    \multicolumn{6}{c}{\textbf{Ethiopia (1975) --- 3 actual interventions}} \\
+    \cmidrule(lr){1-6}
+    USSR$^\ast$          & .14 & $\checkmark$ & Somalia            & .66 & $\checkmark$ \\
+    South Yemen          & .12 &              & United States$^\ast$ & .06 &              \\
+    United States$^\ast$ & .11 &              & North Yemen        & .06 &              \\
+    Iran                 & .04 &              & Sudan              & .04 &              \\
+    Saudi Arabia         & .03 &              & South Yemen        & .02 &              \\
+    \addlinespace
+    \multicolumn{6}{c}{\textbf{Afghanistan (1978) --- 4 actual interventions}} \\
+    \cmidrule(lr){1-6}
+    USSR$^\ast$            & .29 & $\checkmark$ & Pakistan             & .45 & $\checkmark$ \\
+    United Kingdom$^\ast$  & .11 &              & United States$^\ast$ & .08 & $\checkmark$ \\
+    China$^\ast$           & .09 &              & United Kingdom$^\ast$  & .06 &              \\
+    United States$^\ast$   & .07 &              & China$^\ast$         & .05 &              \\
+    Iran                   & .07 &              & Iran                 & .04 & $\checkmark$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Top five predicted interveners for three canonical onsets.
+    Out-of-fold probabilities, averaged across 25 imputation draws.
+    $^\ast$P5 member. $\checkmark$ indicates the state actually
+    intervened in that direction (Regan coding).  Ten of 12 actual
+    interventions appear in the top five on the correct side.}
+  \label{tab:shadow-dyads}
+\end{table}
+
+Across the three cases, 10 of 12 actual interventions appear in the top five
+on the correct side---and in each case, restricting the measure to P5 states
+would discard the single most important opposition-biased intervener: Zaire
+in Angola, Somalia in Ethiopia, Pakistan in Afghanistan.\footnote{%
+  The United States appears in the top five government-biased predictions for
+  all three cases, yet actually intervened on the opposition side in Angola and
+  Afghanistan.  The model assigns substantial probability mass to \textit{both} sides
+  but defaults toward government-biased intervention because that is the modal
+  US posture across the full sample.  This directional ambiguity for superpowers
+  is one reason the country-year aggregation is preferable to raw dyad-level
+  predictions: summing across all potential interveners preserves the correct
+  signal that these countries faced unusually high total intervention pressure,
+  even where the classifier hedges on which side a specific superpower would take.}
+
+Figure~\ref{fig:shadow-kde} shows the cross-sectional distribution of $E^G$ and $E^O$
+across all country-years.  Both measures are heavily right-skewed: the
+median country-year faces modest intervention expectations, but a long
+right tail captures the handful of states embedded in dense alliance
+networks and superpower competition.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fig-shadow-kde.pdf}
+  \caption{Kernel density estimates of $E^G$ and $E^O$ across all
+    country-years (1946--2014), averaged across 25 imputation draws.}
+  \label{fig:shadow-kde}
+\end{figure}
+
+Figure~\ref{fig:shadow-ts} illustrates the temporal dynamics for three countries
+with well-documented intervention environments.  South Vietnam shows the
+cleanest signal: both measures ramp from approximately 0.6 in 1960 to
+$E^G = 6.68$ and $E^O = 5.21$ at the peak of the war in 1972---an order
+of magnitude above typical countries.
+Afghanistan illustrates a regime-switching dynamic: the 1978 Saur Revolution
+raises $E^G$ to 0.84, but by 1979 $E^O$ overtakes $E^G$ ($1.17$ vs $0.85$),
+correctly capturing the surge in mujahideen support from Pakistan, the
+United States, and others.
+Egypt provides a critical out-of-sample check: it experiences no civil war
+onset in our data, so the shadow measures are pure counterfactual predictions.
+The classifier nonetheless tracks the geopolitical environment---the 1967
+Six Day War spike ($E^G = 7.67$), the post-1972 Soviet expulsion drop, the
+1991 Gulf War spike---evidence of genuine temporal tracking, not mere
+onset-fitting.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{fig-shadow-ts.pdf}
+  \caption{Shadow measure time series ($E^G$ and $E^O$) for five countries
+    with well-documented intervention environments.  Probabilities averaged
+    across 25 imputation draws.}
+  \label{fig:shadow-ts}
+\end{figure}
+
+$E^G$ correlates positively with both existing measures of anticipated
+intervention: the Lake security hierarchy used by \citet{cunningham2016}
+($r = 0.29$, $n = 161$) and the structural P5 intervention probabilities
+estimated by \citet{gibilisco2022} ($r = 0.53$, $n = 145$).  The stronger
+correlation with G\&M is expected---both capture intervention propensity
+directly---while the moderate hierarchy correlation reflects the fact that
+US dominance is only one component of the broader intervention environment
+(Appendix~\ref{app:cunningham}, Figure~\ref{fig:hierarchy}).

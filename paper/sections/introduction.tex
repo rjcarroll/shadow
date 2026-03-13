@@ -1,0 +1,98 @@
+% ============================================================
+% Introduction
+% ============================================================
+
+A growing body of theory predicts that \textit{anticipated} third-party
+intervention shapes civil war onset
+\citep{cetinyan2002,cunningham2016,dudley2024,gibilisco2022,kuperman2008,kyddstraus2013,lango2023,sambanis2020},
+yet the quantity has never been measured systematically.  No existing measure
+covers the full population of potential interveners, varies annually with
+shifting alliances and foreign policy alignments, and treats intervention
+direction---government-biased versus opposition-biased---as the primary
+quantity of interest.  This paper constructs such a measure and uses it
+to test the hypothesis that the shadow of intervention deters and
+emboldens.
+
+The construction is the core contribution.  A machine-learning ensemble
+trained on the \citet{regan2000} dataset of military
+interventions (1946--2014) predicts, for each directed dyad in a given
+year, the probability and direction of intervention.  Dyad-level
+predictions are aggregated across all potential interveners to produce a
+country-year shadow, disciplined by a Nash fixed-point condition
+requiring each state's predicted probability to be self-consistent as an
+input to the others' predictions.  The resulting measures are tested in
+a standard country-year onset framework \citep{fearon2003}: expected
+government-biased intervention enters negatively (deterrence), expected
+opposition-biased intervention enters positively (emboldening), with the
+directional pattern robust across specifications, measurement draws, and
+a country fixed-effects estimator.
+
+The closest existing approaches each sacrifice scope for
+identification.  \citet{cunningham2016} uses the Lake
+security hierarchy as a proxy for anticipated government-biased
+intervention---a static, unidirectional measure restricted to the US
+patron-client channel.  The present paper generalizes in three
+directions: it covers all potential interveners, both sides of
+intervention, and derives probabilities from a calibrated classifier
+rather than structural position.
+\citet{gibilisco2022} derive equilibrium intervention
+expectations from a structural game among the P5, gaining clean
+identification at the cost of restricting the player set to a size that
+keeps joint-game estimation tractable.  In the Regan data, P5 states
+account for fewer than half of all military interventions; the remaining
+53 intervening states---neighbors, coethnics, regional rivals, Cold War
+proxies---represent the majority of actual deployments and are driven by
+logics qualitatively different from the global-order interests that
+animate P5 behavior.  \citet{lango2023} develops a
+formal model in which the threat of rebel-sided intervention can
+simultaneously deter onset---by compelling governments to concede---and
+encourage it---by raising rebels' expected return from fighting; the
+utility parameters in the present framework can represent these
+nonmonotone effects.
+
+This paper takes a learned-proxy approach: a flexible first-stage model
+constructs the latent quantity, and a parametric second-stage model tests
+the theory.  This two-stage design is an increasingly common way to
+bring machine learning into social science inference
+\citep{knoxlucascho2022}, and arguably the least controversial
+\citep{moruccispirling2024}: the ensemble does the measurement work it is
+suited for, while the onset regression retains the interpretability that
+causal claims require.  The design nests the structural functional
+form---the unpenalized multinomial logit in the ensemble library directly
+corresponds to the softmax best-response function of
+\citet{gibilisco2022}---so whether that parametric
+assumption fits the data is answered empirically rather than imposed by
+construction.  (It earns less than one percent of the ensemble weight;
+the data strongly prefer nonparametric alternatives.)
+
+The learned-proxy approach has well-documented pitfalls.
+\citet{knoxlucascho2022} catalog these systematically:
+measurement-stage uncertainty is routinely ignored, proxy quality is
+asserted rather than tested, and the disconnect between prediction and
+inference is papered over.  This paper follows their recommendations
+closely: Stage~1 performance is validated out-of-fold across 25
+imputation draws; measurement uncertainty is propagated into Stage~2 via
+a two-stage pairs cluster bootstrap that averages across all 25 draws;
+calibration is verified by reliability diagrams; and a labeled-only
+robustness check confirms that the onset estimates are not driven by
+out-of-sample extrapolation.  The honest accounting of generated-regressor
+uncertainty is itself a result: the corrected standard errors are roughly
+2.9--3.5 times larger than naive MLE output, with a variance decomposition
+showing that approximately 88--92\% of the total coefficient variance originates
+in the measurement stage and only 8--12\% from primary-analysis sampling.  The
+measurement model, not the regression, is the binding source of
+uncertainty---precisely the situation \citet{knoxlucascho2022} warn about.
+The two shadow variables are correlated at $r = 0.94$, which inflates
+individual confidence intervals, but tested jointly they reject the
+baseline at $p < 0.001$; the directional pattern holds across all 25
+measurement draws, ten specifications, and country fixed effects.
+The shadow subsumes both the Lake security hierarchy
+\citep{cunningham2016} and the \citet{gibilisco2022} structural P5
+estimates: neither adds explanatory power once the shadow variables are
+included.
+
+The paper proceeds as follows.  Section~\ref{sec:motivation} develops the theoretical
+framework linking intervention expectations to the onset decision.
+Section~\ref{sec:constructing} describes the construction and validation of the
+shadow measure.  Section~\ref{sec:decision} presents the onset analysis, including
+measurement-corrected inference and heterogeneous-utility extensions.

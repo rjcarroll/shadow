@@ -1,22 +1,17 @@
-"""Build spatial weights matrix and add spatial lag predictors.
+"""Build spatial weights matrices and add spatial lag predictors.
 
 Replaces R scripts 10-makeWpol.R and 11-addSpatial.R.
 
-For each year, constructs a row-normalised polity-similarity weight matrix W
-where W[i,j] = 1 / |polity2_i − polity2_j|  (0 on diagonal; 0 if equal).
-Higher weight → more similar polity score → stronger strategic influence.
+Original 10 spatial lag variables (polity-similarity W + superpower indicators):
+  spat_gov, spat_opp, spat_US_G, spat_USSR_G, spat_US_O, spat_USSR_O,
+  spat_US_USRG, spat_US_USRO, spat_USR_USG, spat_USR_USO
 
-10 spatial lag variables per onset row:
-  spat_gov      weighted fraction of other potential interveners coded gov-biased
-  spat_opp      weighted fraction coded opp-biased
-  spat_US_G     1 if USA (002) is gov-biased in this conflict
-  spat_USSR_G   1 if USSR/Russia (364) is gov-biased
-  spat_US_O     1 if USA is opp-biased
-  spat_USSR_O   1 if USSR/Russia is opp-biased
-  spat_US_USRG  1 if B==USA and USSR is gov-biased  (interaction)
-  spat_US_USRO  1 if B==USA and USSR is opp-biased
-  spat_USR_USG  1 if B==USSR and USA is gov-biased
-  spat_USR_USO  1 if B==USSR and USA is opp-biased
+New 10 spatial lag variables (era-invariant mechanisms):
+  spat_region_gov/opp   — same-region W (binary, row-normalised)
+  spat_igo_gov/opp      — shared-IGO-membership W (count, row-normalised)
+  spat_chain_gov/opp    — contiguity chain (both B and B' border host A)
+  spat_ideal_gov/opp    — UNGA ideal-point proximity W (1/|diff|)
+  spat_P5_gov/opp       — mean P5 member predictions (G&M 2022)
 
 Output per DD file: data/interim/dd_spat_{cy}_{ud}.parquet
 """
@@ -28,6 +23,13 @@ import pandas as pd
 
 USA  = "002"
 USSR = "364"
+P5_CODES = frozenset({"002", "200", "220", "364", "710"})
+
+REGION_COLS_B = [
+    "reg_asia_B", "reg_eeurope_B", "reg_latinAmerica_B",
+    "reg_mena_B", "reg_western_B",
+]
+REGION_NAMES = ["asia", "eeurope", "latinAmerica", "mena", "western"]
 
 SPAT_COLS = [
     "spat_gov", "spat_opp",
@@ -35,10 +37,28 @@ SPAT_COLS = [
     "spat_US_USRG", "spat_US_USRO", "spat_USR_USG", "spat_USR_USO",
 ]
 
+NEW_SPAT_COLS = [
+    "spat_region_gov", "spat_region_opp",
+    "spat_igo_gov", "spat_igo_opp",
+    "spat_chain_gov", "spat_chain_opp",
+    "spat_ideal_gov", "spat_ideal_opp",
+    "spat_P5_gov", "spat_P5_opp",
+]
+
+ALL_SPAT_COLS = SPAT_COLS + NEW_SPAT_COLS
+
 
 # ---------------------------------------------------------------------------
-# Internal helpers
+# W matrix builders
 # ---------------------------------------------------------------------------
+
+def _row_normalise(W: np.ndarray) -> np.ndarray:
+    """Row-normalise in place; rows summing to 0 remain 0."""
+    row_sums = W.sum(axis=1, keepdims=True)
+    row_sums[row_sums == 0.0] = 1.0
+    W /= row_sums
+    return W
+
 
 def _build_W(polity: pd.Series) -> pd.DataFrame:
     """
@@ -67,13 +87,85 @@ def _build_W(polity: pd.Series) -> pd.DataFrame:
         W = np.where(diff == 0.0, 0.0, 1.0 / diff)
     np.fill_diagonal(W, 0.0)
 
-    # Row-normalise; rows that sum to 0 remain 0.
-    row_sums = W.sum(axis=1, keepdims=True)
-    row_sums[row_sums == 0.0] = 1.0
-    W /= row_sums
+    return pd.DataFrame(_row_normalise(W), index=p.index, columns=p.index)
 
-    return pd.DataFrame(W, index=p.index, columns=p.index)
 
+def _build_W_proximity(values: pd.Series) -> pd.DataFrame:
+    """Row-normalised proximity W: W[i,j] = 1/|v_i - v_j|.  Same as polity W."""
+    return _build_W(values)
+
+
+def _build_W_binary(labels: pd.Series) -> pd.DataFrame:
+    """Row-normalised binary W: W[i,j] = 1 if labels[i] == labels[j]."""
+    labs = labels.dropna()
+    if len(labs) < 2:
+        return pd.DataFrame(index=labs.index, columns=labs.index, dtype=float).fillna(0.0)
+    vals = labs.values
+    W = (vals[:, None] == vals[None, :]).astype(float)
+    np.fill_diagonal(W, 0.0)
+    return pd.DataFrame(_row_normalise(W), index=labs.index, columns=labs.index)
+
+
+def _extract_region_labels(ccode_attrs: pd.DataFrame) -> pd.Series:
+    """Extract region label per ccode from reg_*_B one-hot dummies.
+
+    Parameters
+    ----------
+    ccode_attrs : pd.DataFrame
+        Index = ccode_B, columns include reg_*_B.
+
+    Returns
+    -------
+    pd.Series : ccode → region name (str).  Missing regions → "other".
+    """
+    region = pd.Series("other", index=ccode_attrs.index, dtype=object)
+    for name, col in zip(REGION_NAMES, REGION_COLS_B):
+        if col in ccode_attrs.columns:
+            mask = ccode_attrs[col] == 1
+            region.loc[mask] = name
+    return region
+
+
+# ---------------------------------------------------------------------------
+# Shared spatial lag helper
+# ---------------------------------------------------------------------------
+
+def _w_lag(
+    W_full: pd.DataFrame,
+    B_ccodes: np.ndarray,
+    gov_vec: np.ndarray,
+    opp_vec: np.ndarray,
+    A_ccode: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute W × gov_vec and W × opp_vec, aligned to B_ccodes.
+
+    Drops host country A from W before multiplication.
+    Returns (spat_gov, spat_opp) as numpy arrays.
+    """
+    n = len(B_ccodes)
+    W = W_full.drop(index=A_ccode, columns=A_ccode, errors="ignore")
+    if W.empty or len(W) < 2:
+        return np.zeros(n), np.zeros(n)
+
+    b_in_W = [b for b in B_ccodes if b in W.index]
+    if not b_in_W:
+        return np.zeros(n), np.zeros(n)
+
+    gv = pd.Series(gov_vec, index=B_ccodes).reindex(W.columns, fill_value=0.0).values
+    ov = pd.Series(opp_vec, index=B_ccodes).reindex(W.columns, fill_value=0.0).values
+
+    sg = pd.Series(W.values @ gv, index=W.index)
+    so = pd.Series(W.values @ ov, index=W.index)
+
+    return (
+        sg.reindex(B_ccodes, fill_value=0.0).values,
+        so.reindex(B_ccodes, fill_value=0.0).values,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Original helpers (polity W + superpower indicators) — unchanged
+# ---------------------------------------------------------------------------
 
 def _spat_for_onset(
     W_year: pd.DataFrame,
@@ -242,23 +334,174 @@ def _spat_for_onset_proba(
     return out
 
 
+# ---------------------------------------------------------------------------
+# New spatial lags (era-invariant mechanisms)
+# ---------------------------------------------------------------------------
+
+def _new_spat(
+    W_yr: dict,
+    B_ccodes: np.ndarray,
+    gov_vec: np.ndarray,
+    opp_vec: np.ndarray,
+    A_ccode: str,
+    contiguity: np.ndarray,
+    is_P5: np.ndarray,
+) -> pd.DataFrame:
+    """
+    Compute NEW_SPAT_COLS for one onset (A, year) group.
+
+    Parameters
+    ----------
+    W_yr : dict
+        {"polity": W, "region": W, "ideal": W, "igo": W} for this year.
+    gov_vec, opp_vec : np.ndarray
+        Either hard-coded (0/1) or predicted probabilities, aligned to B_ccodes.
+    contiguity : np.ndarray
+        ud_conttype values per B (1-5 = contiguous, 6 = not).
+    is_P5 : np.ndarray
+        is_P5_B values per B (0 or 1).
+    """
+    n = len(B_ccodes)
+    out = pd.DataFrame(
+        {c: np.zeros(n) for c in NEW_SPAT_COLS},
+        index=B_ccodes,
+    )
+
+    # ── W-based lags (region, IGO, ideal) ──────────────────────────────
+    for prefix, wtype in [("region", "region"), ("igo", "igo"), ("ideal", "ideal")]:
+        W = W_yr.get(wtype, pd.DataFrame())
+        if not W.empty and len(W) >= 2:
+            sg, so = _w_lag(W, B_ccodes, gov_vec, opp_vec, A_ccode)
+            out[f"spat_{prefix}_gov"] = sg
+            out[f"spat_{prefix}_opp"] = so
+
+    # ── Contiguity chain W ─────────────────────────────────────────────
+    contig_mask = contiguity <= 5
+    if contig_mask.sum() >= 2:
+        c = contig_mask.astype(float)
+        W_chain = np.outer(c, c)
+        np.fill_diagonal(W_chain, 0.0)
+        _row_normalise(W_chain)
+        out["spat_chain_gov"] = W_chain @ gov_vec
+        out["spat_chain_opp"] = W_chain @ opp_vec
+
+    # ── P5 spatial lag (leave-one-out for P5 members) ──────────────────
+    p5_mask = np.array([b in P5_CODES for b in B_ccodes])
+    n_p5 = int(p5_mask.sum())
+    if n_p5 > 0:
+        p5_sum_g = float(gov_vec[p5_mask].sum())
+        p5_sum_o = float(opp_vec[p5_mask].sum())
+
+        # All rows get mean over all P5 members
+        spat_p5_g = np.full(n, p5_sum_g / n_p5)
+        spat_p5_o = np.full(n, p5_sum_o / n_p5)
+
+        # P5 members get leave-one-out mean
+        if n_p5 > 1:
+            spat_p5_g[p5_mask] = (p5_sum_g - gov_vec[p5_mask]) / (n_p5 - 1)
+            spat_p5_o[p5_mask] = (p5_sum_o - opp_vec[p5_mask]) / (n_p5 - 1)
+        else:
+            spat_p5_g[p5_mask] = 0.0
+            spat_p5_o[p5_mask] = 0.0
+
+        out["spat_P5_gov"] = spat_p5_g
+        out["spat_P5_opp"] = spat_p5_o
+
+    return out
+
+
+# ---------------------------------------------------------------------------
+# W cache (multi-type: polity + region + ideal + IGO)
+# ---------------------------------------------------------------------------
+
 def _build_W_cache(dd: pd.DataFrame, onset_mask: pd.Series) -> dict:
-    """Build year-indexed W matrix cache from polity2_B in dd."""
-    pol_lookup = (
-        dd[["ccode_B", "year", "polity2_B"]]
-        .dropna(subset=["polity2_B"])
-        .groupby(["year", "ccode_B"])["polity2_B"]
+    """Build year-indexed multi-type W matrix cache from dd.
+
+    Returns
+    -------
+    dict : {year: {"polity": W, "region": W, "ideal": W, "igo": W}}
+    """
+    # Per-ccode-year attributes (take first per (ccode_B, year))
+    attr_cols = ["ccode_B", "year", "polity2_B"]
+    for c in REGION_COLS_B:
+        if c in dd.columns:
+            attr_cols.append(c)
+    if "ideal_point_B" in dd.columns:
+        attr_cols.append("ideal_point_B")
+
+    ccode_attrs = (
+        dd[attr_cols]
+        .dropna(subset=["ccode_B"])
+        .groupby(["year", "ccode_B"])
         .first()
     )
-    W_cache: dict[int, pd.DataFrame] = {}
-    for yr in dd.loc[onset_mask, "year"].unique():
-        if yr in pol_lookup.index.get_level_values("year"):
-            pol_yr = pol_lookup.loc[yr]
-        else:
-            pol_yr = pd.Series(dtype=float)
-        W_cache[yr] = _build_W(pol_yr)
-    return W_cache
 
+    # Dyadic IGO lookup
+    has_igo = "igo_shared" in dd.columns
+    igo_lookup = None
+    if has_igo:
+        igo_lookup = (
+            dd[["year", "ccode_A", "ccode_B", "igo_shared"]]
+            .dropna(subset=["igo_shared"])
+            .groupby(["year", "ccode_A", "ccode_B"])["igo_shared"]
+            .first()
+        )
+
+    onset_years = dd.loc[onset_mask, "year"].unique()
+    cache: dict[int, dict[str, pd.DataFrame]] = {}
+
+    for yr in onset_years:
+        yr_cache: dict[str, pd.DataFrame] = {}
+
+        if yr in ccode_attrs.index.get_level_values("year"):
+            yr_attrs = ccode_attrs.loc[yr]
+        else:
+            yr_attrs = pd.DataFrame()
+
+        # Polity W
+        if not yr_attrs.empty and "polity2_B" in yr_attrs.columns:
+            yr_cache["polity"] = _build_W(yr_attrs["polity2_B"])
+        else:
+            yr_cache["polity"] = pd.DataFrame()
+
+        # Region W
+        if not yr_attrs.empty and any(c in yr_attrs.columns for c in REGION_COLS_B):
+            yr_cache["region"] = _build_W_binary(_extract_region_labels(yr_attrs))
+        else:
+            yr_cache["region"] = pd.DataFrame()
+
+        # Ideal point W
+        if not yr_attrs.empty and "ideal_point_B" in yr_attrs.columns:
+            yr_cache["ideal"] = _build_W_proximity(yr_attrs["ideal_point_B"])
+        else:
+            yr_cache["ideal"] = pd.DataFrame()
+
+        # IGO W
+        if (igo_lookup is not None
+                and yr in igo_lookup.index.get_level_values("year")):
+            yr_igo = igo_lookup.loc[yr]
+            W_igo_raw = yr_igo.unstack(fill_value=0.0)
+            all_codes = sorted(set(W_igo_raw.index) | set(W_igo_raw.columns))
+            W_igo_raw = W_igo_raw.reindex(
+                index=all_codes, columns=all_codes, fill_value=0.0
+            )
+            W_arr = W_igo_raw.values.astype(float)
+            np.fill_diagonal(W_arr, 0.0)
+            yr_cache["igo"] = pd.DataFrame(
+                _row_normalise(W_arr.copy()),
+                index=all_codes, columns=all_codes,
+            )
+        else:
+            yr_cache["igo"] = pd.DataFrame()
+
+        cache[yr] = yr_cache
+
+    return cache
+
+
+# ---------------------------------------------------------------------------
+# Probability-based update (Nash fixed-point iteration)
+# ---------------------------------------------------------------------------
 
 def update_spatial_lags_proba(
     dd: pd.DataFrame,
@@ -268,7 +511,7 @@ def update_spatial_lags_proba(
     onset_only: bool = True,
 ) -> pd.DataFrame:
     """
-    Recompute SPAT_COLS using predicted probability vectors.
+    Recompute ALL_SPAT_COLS using predicted probability vectors.
 
     Used for Nash fixed-point iteration in notebooks 05 and 06.  Replaces
     hard intervention indicators with predicted probabilities so that spatial
@@ -282,24 +525,18 @@ def update_spatial_lags_proba(
     p_gov, p_opp : np.ndarray
         Predicted P(gov) and P(opp) for every row in dd.
     W_cache : dict | None
-        Optional pre-built {year: W_DataFrame} cache.  Computed from dd if
-        not supplied (pass explicitly to avoid rebuilding on every iteration).
+        Optional pre-built {year: {"polity": W, ...}} cache.  Computed from
+        dd if not supplied (pass explicitly to avoid rebuilding each iteration).
     onset_only : bool, default True
-        If True (training mode), only update rows where onset_A == 1 and
-        leave non-onset rows as NaN.
-        If False (universal prediction mode), update ALL (A, year) groups so
-        that the fixed-point equilibrium holds for the full model, not just
-        the observed-conflict subset.  Non-onset rows represent counterfactual
-        conflict scenarios; the equilibrium is a property of the model, not
-        the sample.
+        If True (training mode), only update rows where onset_A == 1.
+        If False (universal prediction mode), update ALL (A, year) groups.
 
     Returns
     -------
-    dd copy with SPAT_COLS updated; behaviour on non-onset rows depends on
-    onset_only.
+    dd copy with ALL_SPAT_COLS updated.
     """
     dd = dd.copy()
-    for col in SPAT_COLS:
+    for col in ALL_SPAT_COLS:
         dd[col] = np.nan
 
     compute_mask = ~((dd["year"] == 1990) & (dd["ccode_B"] == "678"))
@@ -321,23 +558,47 @@ def update_spatial_lags_proba(
 
     update_df = dd.loc[update_mask]
     spat_rows = []
+    new_spat_rows = []
+
     for (A_ccode, year), grp in update_df.groupby(["ccode_A", "year"], sort=False):
-        W_yr = W_cache.get(year, pd.DataFrame())
-        if W_yr.empty:
-            spat_rows.append(pd.DataFrame({c: np.nan for c in SPAT_COLS}, index=grp.index))
-            continue
+        W_yr = W_cache.get(year, {})
+        # Backward compat: old cache format was {year: W_df}
+        if isinstance(W_yr, pd.DataFrame):
+            W_polity = W_yr
+            W_yr_dict = {"polity": W_yr}
+        else:
+            W_polity = W_yr.get("polity", pd.DataFrame())
+            W_yr_dict = W_yr
 
         B_ccodes = grp["ccode_B"].values
         pg = p_gov_s.reindex(grp.index).fillna(0.0).values
         po = p_opp_s.reindex(grp.index).fillna(0.0).values
 
-        spat = _spat_for_onset_proba(W_yr, B_ccodes, pg, po, A_ccode)
-        spat.index = grp.index
-        spat_rows.append(spat)
+        if W_polity.empty:
+            spat_rows.append(pd.DataFrame({c: np.nan for c in SPAT_COLS}, index=grp.index))
+        else:
+            spat = _spat_for_onset_proba(W_polity, B_ccodes, pg, po, A_ccode)
+            spat.index = grp.index
+            spat_rows.append(spat)
+
+        # New spatial lags
+        contiguity = (grp["ud_conttype"].fillna(6).values
+                      if "ud_conttype" in grp.columns
+                      else np.full(len(grp), 6.0))
+        is_P5_arr = (grp["is_P5_B"].fillna(0).values
+                     if "is_P5_B" in grp.columns
+                     else np.zeros(len(grp)))
+        new_sp = _new_spat(W_yr_dict, B_ccodes, pg, po, A_ccode, contiguity, is_P5_arr)
+        new_sp.index = grp.index
+        new_spat_rows.append(new_sp)
 
     if spat_rows:
         spat_all = pd.concat(spat_rows)
         dd.loc[spat_all.index, SPAT_COLS] = spat_all[SPAT_COLS].values
+
+    if new_spat_rows:
+        new_all = pd.concat(new_spat_rows)
+        dd.loc[new_all.index, NEW_SPAT_COLS] = new_all[NEW_SPAT_COLS].values
 
     return dd
 
@@ -348,9 +609,11 @@ def update_spatial_lags_proba(
 
 def add_spatial_lags(dd: pd.DataFrame) -> pd.DataFrame:
     """
-    Add 10 spatial lag columns to an intervention-coded directed-dyad file.
+    Add 20 spatial lag columns (ALL_SPAT_COLS) to an intervention-coded
+    directed-dyad file.
 
-    Replicates 10-makeWpol.R + 11-addSpatial.R.
+    Replicates 10-makeWpol.R + 11-addSpatial.R, extended with era-invariant
+    spatial mechanisms (region, IGO, contiguity chain, ideal point, P5).
 
     Parameters
     ----------
@@ -361,15 +624,13 @@ def add_spatial_lags(dd: pd.DataFrame) -> pd.DataFrame:
 
     Returns
     -------
-    dd with SPAT_COLS appended. Non-onset rows have NaN for all spat_* columns.
+    dd with ALL_SPAT_COLS appended. Non-onset rows have NaN for all spat_* columns.
     """
     dd = dd.copy()
-    for col in SPAT_COLS:
+    for col in ALL_SPAT_COLS:
         dd[col] = np.nan
 
     # R line 48-50 of 11-addSpatial.R: drop ccode 678 (Yemen AR) in 1990.
-    # Treated as a filter only within the spatial computation; the rows remain
-    # in the file but their spat_* columns stay NaN.
     compute_mask = ~((dd["year"] == 1990) & (dd["ccode_B"] == "678"))
     compute_mask &= ~((dd["year"] == 1990) & (dd["ccode_A"] == "678"))
 
@@ -378,51 +639,52 @@ def add_spatial_lags(dd: pd.DataFrame) -> pd.DataFrame:
     if onset_mask.sum() == 0:
         return dd
 
-    # ── Build W matrices per year ──────────────────────────────────────────
-    # polity2_B is a property of (ccode_B, year); take the first non-NaN
-    # value for each (ccode_B, year) pair.
-    pol_lookup = (
-        dd[["ccode_B", "year", "polity2_B"]]
-        .dropna(subset=["polity2_B"])
-        .groupby(["year", "ccode_B"])["polity2_B"]
-        .first()
-    )   # MultiIndex (year, ccode_B) → polity2
+    # ── Build multi-type W cache ──────────────────────────────────────
+    W_cache = _build_W_cache(dd, onset_mask)
 
-    onset_years = dd.loc[onset_mask, "year"].unique()
-    W_cache: dict[int, pd.DataFrame] = {}
-    for yr in onset_years:
-        if yr in pol_lookup.index.get_level_values("year"):
-            pol_yr = pol_lookup.loc[yr]     # Series: ccode_B → polity2
-        else:
-            pol_yr = pd.Series(dtype=float)
-        W_cache[yr] = _build_W(pol_yr)
-
-    # ── Compute spatial lags per onset (A, year) ──────────────────────────
+    # ── Compute spatial lags per onset (A, year) ──────────────────────
     onset_df = dd.loc[onset_mask].copy()
 
-    # Group by (ccode_A, year) — each unique onset event.
     spat_rows = []
-    for (A_ccode, year), grp in onset_df.groupby(["ccode_A", "year"], sort=False):
-        W_yr = W_cache.get(year, pd.DataFrame())
-        if W_yr.empty:
-            spat_rows.append(
-                pd.DataFrame(
-                    {c: np.nan for c in SPAT_COLS},
-                    index=grp.index,
-                )
-            )
-            continue
+    new_spat_rows = []
 
-        B_ccodes    = grp["ccode_B"].values
+    for (A_ccode, year), grp in onset_df.groupby(["ccode_A", "year"], sort=False):
+        W_yr = W_cache.get(year, {})
+        W_polity = W_yr.get("polity", pd.DataFrame())
+
+        B_ccodes     = grp["ccode_B"].values
         intervention = grp["intervention"].fillna(0).values
 
-        spat = _spat_for_onset(W_yr, B_ccodes, intervention, A_ccode)
-        # Re-index to the original DataFrame index for easy assignment.
-        spat.index = grp.index
-        spat_rows.append(spat)
+        # Original polity + superpower lags
+        if W_polity.empty:
+            spat_rows.append(
+                pd.DataFrame({c: np.nan for c in SPAT_COLS}, index=grp.index)
+            )
+        else:
+            spat = _spat_for_onset(W_polity, B_ccodes, intervention, A_ccode)
+            spat.index = grp.index
+            spat_rows.append(spat)
+
+        # New lags: convert intervention to gov/opp vectors
+        gov_vec = (intervention == 1).astype(float)
+        opp_vec = (intervention == 2).astype(float)
+        contiguity = (grp["ud_conttype"].fillna(6).values
+                      if "ud_conttype" in grp.columns
+                      else np.full(len(grp), 6.0))
+        is_P5_arr = (grp["is_P5_B"].fillna(0).values
+                     if "is_P5_B" in grp.columns
+                     else np.zeros(len(grp)))
+        new_sp = _new_spat(W_yr, B_ccodes, gov_vec, opp_vec, A_ccode,
+                           contiguity, is_P5_arr)
+        new_sp.index = grp.index
+        new_spat_rows.append(new_sp)
 
     if spat_rows:
         spat_all = pd.concat(spat_rows)
         dd.loc[spat_all.index, SPAT_COLS] = spat_all[SPAT_COLS].values
+
+    if new_spat_rows:
+        new_all = pd.concat(new_spat_rows)
+        dd.loc[new_all.index, NEW_SPAT_COLS] = new_all[NEW_SPAT_COLS].values
 
     return dd

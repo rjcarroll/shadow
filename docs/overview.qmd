@@ -1,0 +1,269 @@
+---
+title: "Measuring the Shadow of Intervention"
+subtitle: "A two-stage machine learning pipeline for latent geopolitical quantities"
+author: "Robert J. Carroll"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    fig-width: 8
+    fig-height: 5
+---
+
+## The problem
+
+Theory in international relations predicts that *anticipated* third-party
+military intervention shapes whether civil wars start. If a rebel group
+expects powerful states to back the government, fighting looks less
+attractive; if outside support for the opposition is likely, it looks more
+attractive. The quantity that matters---the **shadow of intervention**---is
+an expectation about the international environment, not a realized event.
+
+No one has measured it. Existing approaches either use a static proxy (the
+US security hierarchy) or estimate a structural game restricted to the five
+permanent Security Council members. But P5 states account for fewer than
+half of all military interventions; neighbors, regional rivals, and
+coethnics make up the rest.
+
+This project constructs a measure of expected intervention that covers all
+~190 potential interveners, varies annually with shifting alliances and
+capabilities, and distinguishes government-biased from opposition-biased
+intervention. The measure is then used to test whether the shadow actually
+deters and emboldens.
+
+## Pipeline architecture
+
+The pipeline has two stages, bridged by a game-theoretic equilibrium
+computation.
+
+```
+Raw data (COW, V-Dem, UNGA, trade, alliances, ...)
+    │
+    ▼
+Multiple imputation (miceforest, 5 CY × 5 UD = 25 datasets)
+    │
+    ▼
+105 directed-dyad-year features
+    │
+    ▼
+┌─────────────────────────────────────────────────┐
+│  STAGE 1: Super-learner ensemble                │
+│                                                 │
+│  9 classifiers (RF, 2×HGB, ridge, elastic-net,  │
+│  lasso, multinomial logit, 2×MLP) → 10-fold CV  │
+│  → NNLS stacking on multinomial log-loss         │
+│                                                 │
+│  Spatial lags ←──── Nash fixed-point iteration   │
+│  (predictions feed back as inputs until          │
+│   self-consistent)                               │
+└──────────────────────┬──────────────────────────┘
+                       │
+                       ▼
+              Dyad-level P(intervention | direction)
+                       │
+                       ▼
+              Aggregate to country-year shadow:
+              E_G = Σ P(gov-biased),  E_O = Σ P(opp-biased)
+                       │
+                       ▼
+┌─────────────────────────────────────────────────┐
+│  STAGE 2: Onset logit                           │
+│                                                 │
+│  Does the shadow predict civil war onset?        │
+│  T×P bootstrap (25 draws × 200 cluster reps)    │
+│  propagates measurement uncertainty into SEs     │
+└─────────────────────────────────────────────────┘
+```
+
+### Why the fixed point?
+
+Interveners don't act in isolation. When one state intervenes on the
+government side, rivals face pressure to back the opposition. The
+classifier uses spatial lags---summaries of other states'
+behavior---as features. But out of sample, those lags should reflect the
+model's own predictions, not historical observations. The **Nash
+fixed-point iteration** requires predictions to be self-consistent inputs
+to themselves:
+
+$$\sigma^*(B, A, t) = \hat{M}\bigl(X(B, A, t, \sigma^*)\bigr) \quad \forall\; (B, A, t)$$
+
+This is both a measurement correction (eliminating a deterministic
+discrepancy between lag inputs and probability outputs) and a
+game-theoretic equilibrium condition. Convergence is rapid---two to three
+passes---across all 25 imputation datasets.
+
+## Data architecture
+
+The unit of analysis for the classifier is a **directed dyad-year**: an
+ordered pair (potential intervener $B$, potential host $A$, year $t$). For
+each of ~190 states in the international system across 69 years
+(1946--2014), we ask: would $B$ intervene militarily in $A$'s civil
+conflict, and if so, on which side?
+
+Getting there requires assembling, aligning, and imputing data from a dozen
+sources at three levels of analysis.
+
+### Three levels, one pipeline
+
+**Country-year** features describe each state in isolation: material
+capabilities (GDP, military personnel, iron/steel production from COW
+National Material Capabilities v6), regime type (Polity II, V-Dem liberal
+democracy index, instability indicators), ethnic fractionalization, oil
+wealth, terrain, and foreign policy positioning (UNGA ideal points). These
+come from separate datasets with different country coding schemes, temporal
+coverage, and missingness patterns.
+
+**Undirected-dyad** features describe relationships between pairs of
+states: alliance commitments, bilateral trade, geographic distance,
+contiguity, colonial history, shared IGO membership, territorial disputes,
+and peace quality. Each source uses its own dyad identifier format and
+covers a different time span.
+
+**Directed-dyad** features assign roles: state $A$ is the potential civil
+war host, state $B$ the potential intervener. This doubles many features
+(GDP of $A$ vs GDP of $B$, regime type of $A$ vs regime type of $B$) and
+adds asymmetric quantities like the capability ratio $B/A$. The final
+feature matrix has **105 columns** per directed-dyad-year observation.
+
+### Staged imputation
+
+Missing data is pervasive---early Cold War GDP figures, pre-1965 ideal
+points, incomplete alliance records. A complete-case analysis would
+discard most of the sample.
+
+The imputation uses **miceforest** (MICE with random forests), but the
+staging matters:
+
+1. **Country-year first.** GDP, regime type, and other state-level
+   variables are imputed at the country-year level, producing 5 complete
+   CY panels. This ensures that a country's GDP is the same value in every
+   dyad involving that country---imputing at the dyad level would break
+   this consistency.
+
+2. **Undirected-dyad second.** Bilateral variables (trade, alliance
+   similarity, ideal-point distance) are imputed conditional on the
+   already-imputed CY variables, producing 5 UD draws per CY draw = 25
+   complete datasets.
+
+3. **Directed expansion last.** The undirected dyad $(A, B)$ is expanded
+   into two directed rows $(A \to B)$ and $(B \to A)$, with features
+   assigned by role. No imputation here---just reshaping.
+
+The result is 25 complete directed-dyad-year datasets, each around 25,700
+rows × 105 features, stored as parquet files (~92 MB each for the spatial
+weight matrices, smaller for the feature tables).
+
+### Spatial weight matrices
+
+Ten spatial lag features capture the strategic context: what are other
+potential interveners doing in the same host country? These are weighted
+averages across all states $C \neq B$ of their intervention behavior toward
+$A$, using a polity-similarity weight matrix (states with similar regime
+types get higher weight, reflecting ideological alignment in intervention
+decisions).
+
+The weights are constructed separately for each of the 25 imputation
+datasets, since the polity scores feeding the similarity calculation are
+themselves imputed. This produces 25 distinct spatial weight matrices---each
+~92 MB---that propagate imputation uncertainty through the spatial
+structure.
+
+## Stage 1 results
+
+The ensemble achieves a **proportional reduction in log-loss (PRL) of 47.3%**
+and an AUC of 0.969 on out-of-fold predictions. For a three-class
+rare-event problem where interventions account for ~1% of observations,
+this is substantial.
+
+**Where does the performance come from?** Decomposing the log-loss
+reduction by true class reveals that **94% of the PRL comes from the 1% of
+observations where intervention actually occurred**. Only 6% comes from
+improved calibration of non-events. The classifier earns its keep by
+finding needles, not by calibrating hay---which matters, because sending
+all intervention probabilities to zero is exactly what a standard onset
+model without shadow variables already does.
+
+**Ensemble weights** (averaged across 25 imputation draws):
+
+| Classifier | Weight |
+|:-----------|-------:|
+| Deep MLP (100, 50) | 44.5% |
+| Random forest | 38.6% |
+| Histogram-based GBM (low LR) | 11.1% |
+| Histogram-based GBM | 3.7% |
+| All others | <2.1% |
+
+The multinomial logit---which corresponds to the softmax best-response
+function assumed by structural game-theoretic models---earns about 0.4% of
+the weight. The data prefer nonparametric alternatives.
+
+## The shadow measure
+
+Aggregating dyad-level predictions to the country-year level produces two
+time-varying measures: expected government-biased intervention ($E^G$) and
+expected opposition-biased intervention ($E^O$).
+
+![Shadow measure time series for five countries with well-documented intervention environments.](../paper/figures/fig-shadow-ts.pdf){width=95%}
+
+South Vietnam shows the cleanest signal: both measures ramp through the
+1960s to peak intervention expectations during the war's height. Afghanistan
+captures the regime-switching dynamic of the late 1970s. Egypt---which
+experiences no civil war in our data---provides a pure out-of-sample check:
+the shadow tracks the Six Day War, the Soviet expulsion, and the Gulf War
+purely from counterfactual predictions.
+
+## Stage 2: Does the shadow predict onset?
+
+The onset logit asks whether expected intervention enters the civil war
+calculus as theory predicts.
+
+| | Coefficient | T×P SE | 95% CI |
+|:--|--:|--:|:--|
+| $E^G$ (gov-biased) | −1.62 | 1.37 | [−4.63, +0.69] |
+| $E^O$ (opp-biased) | +0.64 | 1.10 | [−1.94, +2.59] |
+
+The signs are as predicted: government-biased intervention expectations
+**deter** onset; opposition-biased expectations **embolden** it. The
+confidence intervals are wide---by design.
+
+### Honest uncertainty
+
+The T×P bootstrap propagates measurement-stage uncertainty (variation
+across the 25 imputation draws) into the standard errors. This inflates SEs
+by a factor of 3.5× ($E^G$) and 2.9× ($E^O$) relative to naive
+maximum-likelihood estimates. Variance decomposition shows **92% of total
+uncertainty in $E^G$ is measurement-stage** (88% for $E^O$), not sampling
+noise. In other words: the dominant source of uncertainty isn't "do we have
+enough civil wars?"---it's "how precisely can we measure the shadow?"
+
+This is the contribution. Wide confidence intervals from honest uncertainty
+propagation are more informative than narrow intervals that pretend a
+learned proxy is observed data.
+
+## Technical stack
+
+- **Language**: Python 3.14
+- **ML**: scikit-learn (ensemble, logistic, MLP), LightGBM (HGB)
+- **Imputation**: miceforest (multiple imputation by chained equations with random forests)
+- **Data**: pandas, pyarrow/parquet throughout
+- **Paper**: LaTeX
+- **Pipeline**: Jupyter notebooks (01--09), reproducible via nbconvert
+
+## Code
+
+The full pipeline lives in nine notebooks:
+
+| Notebook | What it does |
+|:---------|:-------------|
+| 01 | Country-year panel construction + multiple imputation |
+| 02 | Directed-dyad expansion + bilateral features |
+| 03 | Intervention coding (Regan 1944--1999 + post-1999 extension) |
+| 04 | Spatial weight matrices (25 datasets × polity-similarity weights) |
+| 05 | Stage 1 training (super-learner, 10-fold CV, Nash fixed-point) |
+| 06 | Stage 1 predictions (universal application + aggregation) |
+| 07 | Stage 2 onset analysis (logit, specifications, T×P bootstrap) |
+| 09 | Figure generation |
+
+Source code for data loading, feature engineering, and model utilities is in
+`src/shadow/`.

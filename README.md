@@ -10,6 +10,8 @@ intervention* --- predicts civil war onset in a standard logit framework.
 Measurement-stage uncertainty is propagated into the second-stage standard
 errors following Knox, Lucas, and Cho (2022).
 
+For a detailed walkthrough of the pipeline and results, see [`docs/overview.qmd`](docs/overview.qmd).
+
 ## Repository layout
 
 ```
@@ -17,12 +19,14 @@ src/shadow/         Installable Python package
   data/               Data construction modules (ccode, country_year, dyad,
                         impute, interventions, spatial)
   models/             Ensemble learner and onset models (ensemble, onset)
+  utils/              Plotting utilities
 notebooks/          Jupyter notebooks --- one per pipeline stage (see below)
 scripts/            Standalone scripts (bootstrap, batch re-run)
-paper/              Typst source for the paper
+paper/              LaTeX source for the paper
   sections/           Section files (introduction, motivation, constructing,
                         decision, conclusion, appendix)
   figures/            Generated PDFs
+docs/               Portfolio overview (Quarto)
 data/               Source data (not tracked; see data/README.md)
 tests/              pytest test suite
 ```
@@ -52,8 +56,8 @@ to it; final outputs go to `data/interim/` (model files, predictions) and
 | `04-spatial-weights` | Build spatial weight matrices from intervention predictions | ~20 min |
 | `05-stage1-training` | Train super-learner ensemble (9 classifiers, PCA, 10-fold CV, NNLS stacking) x 25 draws | ~35 hrs |
 | `06-stage1-predictions` | Generate shadow measure: aggregate dyad predictions to country-year E_gov / E_opp | ~30 min |
-| `07-stage2-onset` | Onset logit (9 specs), T x P bootstrap (KLC 2022), FE, robustness checks | ~4 hrs |
-| `09-figures` | All paper figures (7 PDFs) | ~5 min |
+| `07-stage2-onset` | Onset logit (10 specs), T x P bootstrap (KLC 2022), FE, robustness checks | ~4 hrs |
+| `09-figures` | All paper figures | ~5 min |
 
 For batch re-runs: `caffeinate -i bash scripts/rerun_extended.sh 2>&1 | tee rerun.log`
 
@@ -65,11 +69,11 @@ Nine component classifiers spanning three families:
 - **Logistic:** ridge, elastic net, LASSO, unpenalized multinomial
 - **Neural:** MLP (25 units), MLP (100, 50 units)
 
-PCA reduces ~105 features to 54 components (90% cumulative variance).
-NNLS stacking combines out-of-fold predictions. Typical ensemble weights:
-RF ~50%, MLP(100,50) ~30%, HGB(lr=0.05) ~15%.
+PCA reduces ~105 features to ~50--60 components (90% cumulative variance).
+NNLS stacking combines out-of-fold predictions. Ensemble weights:
+MLP(100,50) ~44.5%, RF ~38.6%, HGB(lr=0.05) ~11.1%.
 
-Out-of-fold performance (Regan period): PRL ~45%, AUC ~0.965.
+Out-of-fold performance: PRL 47.3%, AUC 0.969.
 
 ## Stage 2: Onset logit with T x P bootstrap
 
@@ -79,6 +83,16 @@ counts, major-power indicators, and contiguous-neighbor variables. Standard
 errors are corrected for generated-regressor uncertainty by bootstrapping over
 both imputation draws (T=25) and cluster-resampled observations (P=200),
 following Knox, Lucas, and Cho (2022, Section 4.2).
+
+Key results (baseline specification):
+
+| | Coefficient | T×P SE | 95% CI |
+|:--|--:|--:|:--|
+| E_gov (deterrence) | −1.62 | 1.37 | [−4.63, +0.69] |
+| E_opp (emboldening) | +0.64 | 1.10 | [−1.94, +2.59] |
+
+SE inflation relative to naive MLE: 3.5× (E_gov), 2.9× (E_opp). Variance
+decomposition: 92% of uncertainty in E_gov is measurement-stage, not sampling.
 
 ## Tests
 

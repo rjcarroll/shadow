@@ -32,10 +32,9 @@ env/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Typst compiled output (source .typ files are tracked; PDF is generated)
+# LaTeX build artifacts
 paper/shadow.pdf
-
-# LaTeX leftovers (no longer used, but just in case)
+paper/shadow_temp.pdf
 *.aux
 *.bbl
 *.blg
@@ -53,8 +52,12 @@ paper/shadow.pdf
 # macOS
 .DS_Store
 
+# Tresorit conflict files
+*conflict*
+
 # Local-only directories
 readings/
 .tresorit/
 TODO/
 submissions/
+replication/
