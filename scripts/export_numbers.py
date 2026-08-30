@@ -18,8 +18,8 @@ predictions in `sl_oofpm_*` (extracted from the saved model files by
 scripts/distill_sl_models.py; the `prl` column in sl_cv_metrics is the
 *ensemble* value broadcast to every row, so it is NOT used); ensemble
 metrics + AUC-PR + the PRL decomposition come from sl_oof; PCA/feature
-counts + NNLS weights from `sl_model_meta.parquet`; burnout from the
-executed notebook's printed output.  Per-component log-loss uses scikit-learn's
+counts + NNLS weights from `sl_model_meta.parquet`; burnout convergence
+from `sl_spat_conv_*.parquet`.  Per-component log-loss uses scikit-learn's
 default handling (no pre-clip), so hard-zero predictions from tree/MLP learners
 are penalized uniformly; this makes a few overfit candidates' standalone PRL
 strongly negative but does not affect the (smoothed) ensemble or the gap.
