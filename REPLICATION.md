@@ -91,7 +91,13 @@ datasets, redistributed with citation; see `data/README.md` for provenance:
 - `cunningham/cunningham.dta` — Cunningham (2016) replication data
   (Lake security-hierarchy comparison).
 - `gm/conditionalInterventionProbs_replication.csv` — single file from the
-  Gibilisco & Montero (2022) Dataverse archive (structural-P5 comparison).
+  Gibilisco & Montero (2022) Dataverse archive, doi:10.7910/DVN/DKXD2X,
+  CC0 1.0 (structural-P5 comparison).
+
+The G&M file is public domain (CC0). The Regan and Cunningham files are
+author-distributed journal replication data with no formal license,
+redistributed with citation for replication only; they retain their
+original terms.
 
 ## 5. Full rebuild from raw (documentation; not required for verification)
 
