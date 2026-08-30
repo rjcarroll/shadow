@@ -2,6 +2,547 @@
 % Online Appendix
 % ============================================================
 
+\section{The Onset Model}
+\label{app:model}
+
+This appendix supplies the formal model behind Section~\ref{sec:motivation}.
+Parts~\ref{app:game} and~\ref{app:agg} build the onset game of
+Figure~\ref{fig:ntree} and derive Equation~\eqref{eq:EU}, the object the two
+empirical stages estimate.  Parts~\ref{app:payoff} and~\ref{app:bargain} give
+the war payoff its structure and embed it in the bargain.
+Parts~\ref{app:commit}--\ref{app:diverge} work the bargain once under each of
+the three common frictions; Part~\ref{app:transmit} states Expectations~1
+and~2, the comparative statics Section~\ref{sec:decision} tests; and
+Part~\ref{app:hetero} derives the per-type weights read by its heterogeneity
+analysis.
+
+\emph{Notation.}  $O$ and $G$ are the opposition and the government; $i = 1,
+\dots, n$ indexes the potential interveners, each choosing $a_i \in \{O, N,
+G\}$---back the opposition, stand aside, back the government; $\sigma_i$
+collects intervener $i$'s probabilities $(\sigma_i(O), \sigma_i(G))$; $E^O =
+\sum_i \sigma_i(O)$ and $E^G = \sum_i \sigma_i(G)$ are the anticipated
+opposition- and government-biased intervention a country faces; $\tau = E^O -
+E^G$ is the net tilt and $\iota = E^O + E^G$ the common intensity;
+$\pi(\tau)$ is the contest probability and $k_O(\iota)$, $k_G(\iota)$ the war
+burdens, with $k \equiv k_O$ where unambiguous; $\bar{x}$ is the
+credible-concession ceiling (Part~\ref{app:commit}); $q$, $\kappa$, and $\delta(\iota)$ are the
+screen's prior, resolve gap, and intensity increment
+(Part~\ref{app:screen}); $\tau_O$, $\tau_G$, and $\varepsilon$ are
+the two reads of the tilt and the optimism parameter
+(Part~\ref{app:diverge}); and $w_i$ and $b_i$ are type-specific contest and
+burden loadings (Part~\ref{app:hetero}).
+
+\subsection{The game and its shadow}
+\label{app:game}
+
+The decision problem of Figure~\ref{fig:ntree} in the main text has three
+moves.  First, the opposition $O$ chooses whether to mount a challenge; if it
+does not, the status quo prevails.  Second, a challenge opens a bargain over
+control of the state---a stake normalized to $1$: $O$ presses a demand $s \in
+[0,1]$, which the government $G$ accepts---a settlement, on those terms---or
+rejects, in which case war follows.  The bargain is worked in
+Parts~\ref{app:bargain}--\ref{app:diverge}; for the game form, what matters
+is that it ends in one of two ways, a settlement or a war.  Third, in war,
+the $n$ potential interveners respond simultaneously---each backing the
+opposition, the government, or neither---and their combined response is the
+international environment in which the war is fought.
+
+It is this third move that casts the shadow.  Because $O$ and $G$ bargain in
+anticipation of how outside powers would respond, the interveners'
+equilibrium response---call it $\sigma^*$---can decide between peace and war
+before a shot is fired \citep{cetinyan2002}.  Interveners' payoffs depend on
+the war and on one another's actions, not on the demand whose rejection
+produced it, so the intervener subgame is the same at every war node and its
+equilibrium $\sigma^*$ is a single, well-defined object.  Write $U_O(F)$ for
+the opposition's expected payoff from a war so shaped: it is the disagreement
+point of the bargain and the object the rest of this appendix works with.
+
+\emph{Remark (rational expectations).}  Whether $\sigma^*$ approximates the
+expectations that rebels actually form is not merely assumed.  Under rational
+expectations, agents exploit available information at least as well as the
+researcher's model \citep{muth1961}.  The Stage~1 classifier described in
+Section~\ref{sec:constructing} recovers a substantial share of the predictive
+content in realized intervention outcomes using only publicly observable
+state characteristics; rebels who can also draw on private intelligence,
+direct patron relationships, and local knowledge---and who stake their lives
+on the answer---face a forecasting problem
+that is easier, not harder, than the one the classifier solves.
+
+\subsection{Aggregation}
+\label{app:agg}
+
+The shadow $\sigma^*$ is a Nash equilibrium of the intervention subgame: each
+potential intervener $i$ has a utility over the profile $a = (a_1, \dots,
+a_n) \in \{O, N, G\}^n$ of all interveners' actions, and at $\sigma^*$ each
+plays a best response to the rest.  Stated exactly, the opposition's problem
+is intractable: with every other state in the panel a potential
+intervener---as many as \MaxInterveners{} in recent decades---the expected war payoff
+runs over the $3^{n}$ profiles of their joint play, more than the number of
+elementary particles in the observable universe.  Two assumptions reduce the
+problem to a tractable form without discarding its content.
+
+\textbf{Assumption 1 (Separability).}  The opposition's payoff from any
+profile is additive across interveners: $u_O(a) = \sum_i u_O^i(a_i)$, where
+$u_O^i : \{O, N, G\} \rightarrow \mathbb{R}$ measures the marginal
+contribution of intervener $i$'s action.
+
+Separability captures a specific and substantively defensible theory of how
+opposition groups aggregate international expectations: each outside power's
+likely behavior enters the calculus independently, and the combined effect
+is their sum.  A rebel coalition assessing its international environment in
+1970s Angola had a view about what Cuba would likely do, a separate view
+about South Africa, and a separate view about the United States; the
+hypothesis is that these entered additively.  The assumption rules out
+complementarities---the value of Soviet logistics may depend on whether
+Cuban troops are also present---but coordinated multilateral operations
+constitute a small minority of actual interventions.\footnote{%
+  \citet{aydinregan2011} find that the \textit{alignment} among interveners matters for
+  civil war duration: same-side interventions shorten wars only when the
+  intervening states share similar preferences.  This is evidence of
+  complementarities in the conduct phase.  Separability here pertains to
+  the onset calculus---the rebel's assessment of the intervention
+  environment at the moment it decides whether to fight---not to the
+  downstream interactions among interveners once fighting begins.  The
+  spatial lags in the Stage~1 classifier (Section~\ref{sec:constructing}) capture
+  interdependence among interveners' \textit{choices} without requiring that
+  their \textit{effects} on the rebel enter non-additively.}
+
+\textbf{Assumption 2 (Non-intervention as reference).}  For all $i$,
+$u_O^i(N) = 0$.  This normalization makes the intervention-free onset model a
+limiting case: if no state intervenes, the expected utility of fighting
+reduces to purely domestic considerations, and the standard country-year
+onset model follows directly.
+
+Under these two assumptions the opposition's expected payoff from war
+collapses to a sum of marginal terms.  For any joint distribution over
+profiles with marginal intervention probabilities $\sigma_i$, linearity of
+expectation gives $\mathbb{E}\,u_O(a) = \sum_i \mathbb{E}\,u_O^i(a_i)$, and
+the standing-aside terms vanish by Assumption~2, so that
+\begin{equation*}
+  U_O(F; \sigma) \;=\; \sum_{i=1}^{n} \bigl[\sigma_i(O)\, u_O^i(O) +
+  \sigma_i(G)\, u_O^i(G)\bigr] \tag{\ref{eq:EU}}
+\end{equation*}
+---Equation~\eqref{eq:EU} of the main text, here derived rather than posited.
+The marginal probabilities suffice however correlated the interveners'
+actions are.
+
+That sufficiency is what carries the model to the full system of potential
+interveners.  Computing the opposition's expected utility requires only the
+marginals $\sigma_i$, not the joint distribution over all $n$ players'
+actions simultaneously.  Specifying and estimating the full joint game---the
+approach of \citet{gibilisco2022} for the five permanent Security Council
+members---becomes computationally intractable beyond a small player set.
+Separability sidesteps that constraint while preserving the game's central
+implication: the equilibrium strategies of outside powers must be mutually
+consistent.  That consistency requirement is enforced directly via the Nash
+fixed-point iteration described in Section~\ref{sec:constructing}.
+
+Equation~\eqref{eq:EU} has two kinds of unknowns---the probabilities
+$\sigma_i$, estimated in Section~\ref{sec:constructing}, and the weights
+$u_O^i$, recovered from onset behavior in Section~\ref{sec:decision}---and
+the object of interest is the sum at the intervener equilibrium,
+$U_O(F; \sigma^*)$.  The next part gives the weights their structure.
+
+\subsection{The war payoff}
+\label{app:payoff}
+
+Two forces run through the weights $u_O^i$, and they organize everything that
+follows.  The first is the \emph{contest}: support aimed at a side improves
+that side's odds of prevailing.  The government-side half of this is exactly
+the deterrent logic of \citet{cunningham2016}---the prospect of outside
+backing for the incumbent lowers the rebels' expected return to
+fighting---stated here for the full population of potential sponsors rather
+than the single great-power patron on which that analysis centers.  The
+second is the \emph{burden}: whichever side an entrant would favor, its
+involvement makes the war it enters a bigger war---longer, heavier, harder on
+the parties who must fight it.  An anticipated intervener therefore cuts
+twice: once through whom the war would favor, and once through what the war
+would cost.  The payoff that carries these forces is the standard one---the
+opposition prevails with some probability and bears some cost,
+\citeauthor{fearon1995}'s $p$ and $c$---and the shadow enters by tying each
+primitive to one axis: the odds to the tilt, the burden to the intensity.
+
+\textbf{Assumption 3 (Contest and burden).}  With $\tau \equiv E^O - E^G$
+(the net tilt) and $\iota \equiv E^O + E^G$ (the common intensity), the war
+payoffs, in shares of the stake, are
+\[
+  U_O(F) = \pi(\tau) - k_O(\iota), \qquad
+  U_G(F) = \bigl(1 - \pi(\tau)\bigr) - k_G(\iota),
+\]
+where the contest probability $\pi$ is increasing in the tilt, each burden
+$k_O$, $k_G$ is increasing in the intensity, and all three are affine over
+the observed range; states expected to stand aside add no burden (the
+normalization of Assumption~2).  Where only the opposition's burden is in
+play, write $k \equiv k_O$ and $k' \equiv k_O'$.
+
+Assumption~3 states the war payoff in aggregate coordinates;
+Equation~\eqref{eq:EU} requires it to be additive across interveners with
+fixed marginal weights.  Affinity is what reconciles the two.  Because
+$\pi$ and $k_O$ are affine, each can be written exactly as its intercept plus
+a constant slope, $\pi(\tau) = \pi(0) + \pi'\tau$ and $k_O(\iota) = k_O(0) +
+k'\iota$.  Substitute the definitions $\tau = E^O - E^G$ and $\iota = E^O
++ E^G$, with $E^O = \sum_i \sigma_i(O)$ and $E^G = \sum_i \sigma_i(G)$:
+\begin{align*}
+  U_O(F) &= \pi(\tau) - k_O(\iota) \\
+  &= \bigl[\pi(0) - k_O(0)\bigr] + \pi'\,\bigl(E^O - E^G\bigr)
+     - k'\,\bigl(E^O + E^G\bigr) \\
+  &= \bigl[\pi(0) - k_O(0)\bigr] + \sum_{i=1}^{n}
+     \Bigl[(\pi' - k')\,\sigma_i(O) \;-\; (\pi' + k')\,\sigma_i(G)\Bigr].
+\end{align*}
+The sum is Equation~\eqref{eq:EU}, with the same pair of marginal weights for
+every intervener,
+\[
+  u_O^i(O) = \pi' - k', \qquad u_O^i(G) = -(\pi' + k');
+\]
+a curved $\pi$ or $k$ would instead make intervener $i$'s marginal
+contribution depend on the rest of the environment, breaking the additive
+form.  The bracketed intercept $\pi(0) - k_O(0)$ is the war value absent
+any anticipated intervention---the purely domestic term of Assumption~2's
+reference point---constant in the shadow and absorbed empirically into the
+second stage's domestic baseline $\mathbf{X}\boldsymbol{\beta}$;
+Equation~\eqref{eq:EU} records the shadow-dependent part, through which every
+derivative below runs.  Two readings follow at once.  On the government side
+the two forces agree: backing for the incumbent worsens the rebels' odds
+\emph{and} heightens the war's burden, so the theory signs that channel
+unambiguously, $-(\pi' + k') < 0$.  On the opposition side they compete:
+outside backing improves the rebels' odds but heightens the burden of the
+very war in which the help would arrive, and $\pi' - k'$ is a race the theory
+does not resolve.  The natural coordinates of the war payoff are therefore
+not the two channels but the two axes---the tilt, which moves the contest,
+and the intensity, which moves the burden---the combinations the second-stage
+analysis can estimate with any stability (Section~\ref{sec:decision}).
+
+\emph{Remark (why affine).}  Affinity is a local claim, and four observations
+bound its cost.  The observed tilt spans a short arc---the second stage's
+tenth-to-ninetieth-percentile move covers well under a unit on the asinh
+scale---over which any smooth contest function is approximated by its chord.
+The tilt is a difference of matched, co-moving aggregates, so it operates in
+the interior of any S-shaped contest function, where curvature is
+second-order.  The estimation scale is already concave in raw counts---the
+channels enter through asinh---so affinity in $\tau$ still embodies
+diminishing returns to additional interveners.  Affinity is also exactly
+mean-shadow sufficiency, $\mathbb{E}[\pi(\tau)] = \pi(\mathbb{E}\tau)$:
+without it the shadow's variance, not just its level, would become
+payoff-relevant, and the measure would owe the reader second moments.  And
+the conclusions do not hang on it: the next Remark shows the channel signs
+survive on monotonicity alone, and the interaction probe of
+Part~\ref{app:commit} turns up none of the negative tilt-by-intensity product a
+scaling burden would imply.
+
+\emph{Remark (general form).}  Nothing below turns on the exact separation of
+contest from burden in Assumption~3.  With a general $\pi(E^O, E^G)$, increasing in $E^O$ and
+decreasing in $E^G$, and a general $k(E^O, E^G)$, weakly increasing in both,
+the channel-coordinate conclusions hold unchanged---$\partial U_O(F)/\partial
+E^G = \pi_{E^G} - k_{E^G} < 0$ always, while $\partial U_O(F)/\partial E^O =
+\pi_{E^O} - k_{E^O}$ is unsigned---and the axis conclusions hold iff direction
+moves the contest more than the burden, $\pi_{E^O} - \pi_{E^G} > k_{E^O} -
+k_{E^G}$, and intensity moves the burden more than the contest, $k_{E^O} +
+k_{E^G} > \pi_{E^O} + \pi_{E^G}$; both are automatic under the separated form.
+The empirical mapping is a rotation, not a test: the second stage's axis
+coefficients estimate $(\pi', -k')$ directly.  Two overidentifying
+inequalities do follow for the raw channels---the government-side effect
+exceeds the opposition-side effect in magnitude, $\pi' + k' > |\pi' - k'|$,
+and it exceeds the intensity effect, $-(\pi' + k') < -k' < 0$---and both hold
+in the estimates of Section~\ref{sec:decision}.
+
+\subsection{The bargaining stage}
+\label{app:bargain}
+
+Now embed the war value in the bargain.  The protocol is the game's second
+move: on challenging, $O$ presses its demand $s \in [0,1]$ (its share; $G$
+keeps $1 - s$), which $G$ accepts---ending in peace---or rejects, in which
+case war follows.  $G$ accepts iff $1 - s \ge U_G(F)$, that is, iff
+\begin{equation}
+  s \le \pi(\tau) + k_G(\iota). \label{eq:accept}
+\end{equation}
+
+Absent any friction the bargain never breaks.  The largest demand $G$
+accepts, $s = \pi + k_G$, exceeds $O$'s war payoff $\pi - k_O$ by the joint
+burden $k_O + k_G > 0$, so $O$ demands exactly that, $G$ accepts, and war
+never occurs---neither axis moves onset, because onset never varies.  The
+three parts that follow restore one friction at a time---a commitment
+ceiling, private resolve, divergent reads of the shadow---each in the
+vocabulary of Assumption~3.
+
+\subsection{The commitment cutpoint}
+\label{app:commit}
+
+Suppose first that the war costs are common knowledge but that $G$ cannot
+credibly transfer more than a share $\bar{x} < 1$ of the stake: it cannot bind
+its later self to honor a larger concession once the external threat recedes.
+Feasible peaceful offers are then those with $s \le \bar{x}$.  Since $O$
+accepts no share below its war payoff $U_O(F)$, a peaceful division exists iff
+$U_O(F) \le \bar{x}$, and war---onset---occurs exactly when
+\begin{equation}
+  U_O(F) = \pi(\tau) - k_O(\iota) > \bar{x}. \label{eq:cutpoint}
+\end{equation}
+(When the ceiling blocks peace it is the ceiling, not $G$'s willingness, that
+blocks it: $U_O(F) \le \pi + k_G$ always, so a demand $G$ would accept exists
+but exceeds what $G$ can credibly deliver.)  Because $\pi$ rises in the tilt
+and $k_O$ in the intensity, \eqref{eq:cutpoint} is a cutpoint: holding the rest
+fixed, onset switches on as the tilt rises and off as the intensity rises.
+Across a population of country-years with heterogeneous $(\bar{x}, k_O)$, the
+probability of onset is
+$\Pr\!\big(\pi(\tau) - k_O(\iota) > \bar{x}\big)$---a smooth function
+increasing in the tilt, decreasing in the intensity, and saturating in $\pi \in
+[0,1]$, the form the second-stage link estimates, with unobserved
+heterogeneity in the threshold as its error (the domestic intercept
+$\pi(0) - k_O(0)$ and the threshold's observable movers are the second
+stage's $\mathbf{X}\boldsymbol{\beta}$).\footnote{The additive form of \eqref{eq:cutpoint} carries a testable implication: a burden that \emph{scaled} the contest rather than adding to it would sign a tilt-by-intensity product term negative on the index scale. Re-estimating the second-stage model with that product term returns no such negative sign---the coefficient is instead weakly positive (positive in \DirInterFrac\ percent of the 25 measurement draws), so the scaling variant is disfavored. The interaction is not sharply estimated in either direction, as one expects of a product of two channels that are themselves nearly collinear, and none of the paper's claims depends on its form.}
+
+The tilt relationship is weakly monotone, never sign-reversing, provided the
+credible ceiling does not rise with the tilt faster than the contest does:
+$\partial \bar{x}/\partial \tau < \pi'$ suffices for single crossing of
+\eqref{eq:cutpoint} in $\tau$.
+This is precisely where the account parts from \citet{lango2023}, who shows
+that anticipated opposition-biased intervention can \emph{lower} onset: by
+tipping the balance of power against the government, it compels some
+governments to acquiesce---to concede power outright---rather than fight.
+That pacifying channel runs through \emph{credible} concession, modeled there
+as a terminal transfer of power; the commitment friction is precisely its
+denial---the assumption that credible concession is bounded and does not grow
+with the opposition's external backing.  The two accounts agree on what is at
+issue and part only there.  We adopt the friction, and the data lean its
+way: the tilt of the anticipated environment toward the opposition
+predicts \emph{more} onset, not less
+(Section~\ref{sec:decision}).\footnote{The qualitative record agrees the net
+pull is toward war, with rebel leaderships documented conditioning the
+decision to fight on anticipated outside support \citep{kuperman2008,
+kyddstraus2013}.}
+
+\subsection{The common-prior resolve screen}
+\label{app:screen}
+
+Now drop the ceiling and restore the standard information friction: $G$'s
+resolve is private.  The bargain that results is the ubiquitous ultimatum
+screen \citep[e.g.,][]{slantchevtarar2011}, transposed to the onset setting.  $G$ is resolute or soft: the resolute type bears only
+the common intensity burden $\delta = \delta(\iota)$ that war imposes on
+every combatant ($O$'s war cost is $k_O + \delta$; the setup's $k_O(\iota)$
+thus decomposes as an intensity-free base plus the common increment), while
+the soft type bears an additional resolve gap $\kappa > 0$; $q \equiv
+\Pr(\text{resolute})$ is common knowledge.  By \eqref{eq:accept} the resolute
+type accepts any demand $s \le \pi + \delta$ and the soft type any $s \le \pi
++ \kappa + \delta$, so the soft type accepts more.  Two pure demands are
+undominated.  The \emph{safe} demand $s = \pi + \delta$ is accepted by both
+types and yields $O$ that amount with certainty.  The \emph{risky} demand
+$s = \pi + \kappa + \delta$ is accepted only by the soft type: with
+probability $1 - q$ it yields $\pi + \kappa + \delta$, and with probability
+$q$ it is refused and war yields $U_O(F) = \pi - k_O - \delta$.  $O$ prefers
+the risky demand iff
+\[
+  (1 - q)(\pi + \kappa + \delta) + q(\pi - k_O - \delta) \;\ge\; \pi + \delta,
+\]
+which reduces to
+\begin{equation}
+  (1 - q)\,\kappa \;\ge\; q\,(k_O + 2\delta). \label{eq:riskreturn}
+\end{equation}
+Two things have happened.  The balance of power $\pi(\tau)$ has dropped out:
+it shifts both acceptance thresholds and $O$'s war payoff by the same amount,
+relocating the division but cancelling from the risky-versus-safe comparison.
+The burden has not: $\delta(\iota)$ survives on the right of
+\eqref{eq:riskreturn}---the war $O$ risks is costlier, while the safe demand,
+tracking both types' diminished war values, extracts more---so the
+equilibrium probability of war,
+\[
+  \Pr(\text{onset}) = q \cdot \mathbf{1}\!\left[(1 - q)\,\kappa \ge
+  q(k_O + 2\delta)\right],
+\]
+is weakly \emph{decreasing} in the intensity and independent of the tilt.  At the
+corner, where $\pi$ is high enough that demands are capped at the whole stake,
+raising $\pi$ only \emph{lowers} the chance of war, as $O$ comes to extract
+the entire stake peacefully; the screen therefore never produces a positive
+tilt effect, interior or corner.
+
+Two features of the cost structure are load-bearing.  The intensity increment is
+\emph{additive} and \emph{type-common}: it attaches to the character of the
+war---longer, heavier, more internationalized---rather than to the
+government's resolve.  A multiplicative burden scaling all costs equally would
+cancel from the interior comparison, and an increment that fell
+disproportionately on the soft type could reverse the sign; the substantive
+content of Assumption~3's burden is exactly the type-common reading.
+
+\emph{Remark (screening on capacity).}  Nothing here turns on resolve being
+the private object.  Let the government's type instead be its capacity: $O$
+prevails with probability $\pi_L(\tau)$ against a strong government and
+$\pi_H(\tau)$ against a weak one, $\pi_H(0) > \pi_L(0)$, both types shifted
+equally by the tilt, with the war costs $k_O + \delta$ and $k_G + \delta$
+common knowledge.  The screen replays: the weak type accepts more, the safe
+demand is $\pi_L + k_G + \delta$, and the risky demand $\pi_H + k_G + \delta$
+is refused by the strong type---against whom the war is then fought.  The
+risky demand is preferred iff
+\[
+  (1 - q)\,\Delta\pi \;\ge\; q\,(k_O + k_G + 2\delta), \qquad
+  \Delta\pi \equiv \pi_H(0) - \pi_L(0),
+\]
+with $q$ now the probability of the strong type.  The tilt enters the safe
+demand, the risky demand, and the war payoff alike, and cancels with weights
+$(1 - q) + q - 1 = 0$; the intensity survives in $2\delta$.  The row is
+unchanged: what is screened supplies the spread---the resolve gap $\kappa$ or
+the capacity gap $\Delta\pi$---but the cancellation belongs to the screen
+itself, so a positive tilt effect excludes it whatever the private object.
+(As with costs, type-dependence in the \emph{sensitivity} to the tilt,
+$\pi'_H > \pi'_L$, would let the spread grow with $\tau$ and transmit it; the
+parallel caveat applies.)
+
+The screen, then, transmits the intensity and blocks the tilt: onset falls in
+$\iota$ here as under commitment, but no positive tilt effect can arise
+through this channel.  It is the tilt's presence in the data, not the
+intensity's, that discriminates among the frictions (Expectation~2, Part~\ref{app:transmit}).
+
+\subsection{Divergent expectations}
+\label{app:diverge}
+
+Finally, drop the private resolve and let the parties read the shadow itself
+differently.  The shadow is a forecast of third parties' conduct in a war that
+has not happened; no pre-war exchange can realize it, so the government and
+the rebels can hold---and know they hold---different estimates of it
+\citep{cetinyan2002, thyne2006}.%
+% CITE-SLOT (updated 2026-07-15): Fey & Ramsay 2007 READ + CITED (Theorem 1, common-prior no-war). Slantchev & Tarar 2011 READ + CITED (common-prior processing point, clause below) + aumann1976 added (verified via S&T ref list). OPTIONAL remaining: Smith & Stam 2004 (heterogeneous-priors war model) — still not in readings/; do not add unverified.
+{}  Held as common knowledge, such divergence departs from common priors
+\citep{aumann1976}: among common-prior rationals, different reads are private
+information, and the bargain processes private information as the
+screen \citep[cf.][]{slantchevtarar2011}.  This friction therefore runs on
+priors that differ---a primitive the other two bargains do not need.  Let
+$\tau_O$ and $\tau_G$ be the two reads of the tilt, common
+knowledge, with war costs $k_O(\iota)$ and $k_G(\iota)$ as above.  $G$ accepts
+any demand $s \le \pi(\tau_G) + k_G$, and $O$, knowing this, compares the best
+acceptable settlement with war as \emph{it} sees war: onset occurs iff
+$\pi(\tau_O) - k_O > \pi(\tau_G) + k_G$, that is, iff
+\begin{equation}
+  \pi(\tau_O) - \pi(\tau_G) \;>\; k_O(\iota) + k_G(\iota).
+  \label{eq:wedge}
+\end{equation}
+War requires the rebels' optimism about the tilt to exceed the joint burden of
+fighting.  Under proportional optimism---$\tau_O = (1+\varepsilon)\tau$,
+$\tau_G = \tau$, $\varepsilon > 0$---the wedge is $\varepsilon \pi' \tau$,
+growing wherever the environment tilts toward the opposition; across
+country-years heterogeneous in $(\varepsilon, k_O + k_G)$, the probability of onset
+rises in $\tau$ (on $\tau > 0$) and falls in $\iota$.  Two limits mark the
+channel's shape: it is one-sided, silent where the environment tilts against
+the opposition, and it saturates, the wedge vanishing as $\pi$ approaches its
+bounds.  Under a common prior the construction would unravel: because war here
+requires both a demand the government will refuse and the refusal itself,
+each side must read the other's willingness to fight as information, and
+\citet{feyramsay2007} show that no equilibrium war survives those
+inferences---war by mutual optimism requires beliefs a common prior cannot
+deliver.  The channel therefore rests on heterogeneous priors, and what makes
+that escape unusually defensible here is the object of the disagreement: the
+counterfactual conduct of third parties, which no pre-war exchange between
+the combatants can arbitrate and only war itself reveals.  This is the mechanism of
+\citet{cetinyan2002} and \citet{thyne2006} in the present notation: not the
+potential for intervention but different expectations of it is what moves
+onset through this channel.
+
+\subsection{What the frictions transmit}
+\label{app:transmit}
+
+The three instances work the bargain once under each friction, all in the
+vocabulary of Assumption~3, and their comparison yields a taxonomy: the two
+axes carry different evidentiary weight.  That onset falls with the intensity
+of the anticipated environment is close to common property---any costly-war
+bargain that produces war with positive probability delivers it.  That onset
+rises with the tilt is the diagnostic fact: no frictionless or common-prior
+account transmits it, so its presence in the data is a trace of a friction
+that lets the balance of power reach the decision to fight.
+
+\textbf{Expectation 1 (Axes of the shadow).}  Under the commitment friction,
+the probability of onset is increasing in the net tilt $\tau = E^O - E^G$ and
+decreasing in the common intensity $\iota = E^O + E^G$ of anticipated
+intervention (by Equation~\eqref{eq:cutpoint} and the weights of
+Part~\ref{app:payoff}).  In channel coordinates the government-side effect is
+$-(\pi' + k') < 0$---contest and burden push together---while the
+opposition-side effect is the race $\pi' - k'$, which the theory does not
+sign.  The account is falsified by a robustly negative tilt effect or a
+robustly positive intensity effect; it is falsified by neither sign of the
+raw opposition channel, whose fragility it expects.
+
+\textbf{Expectation 2 (What the frictions transmit).}  The probability of
+onset falls in the common intensity under all three bargains---weakly under
+the common-prior screen, strictly under the commitment ceiling and divergent
+expectations---but rises in the net tilt only under the latter two: under
+commitment throughout, under divergent expectations one-sidedly, on the
+region where the environment already tilts toward the opposition.  Under the
+common-prior screen it cannot rise in the tilt, interior or corner.  A
+positive tilt effect therefore excludes the frictionless and common-prior
+accounts, while leaving commitment and divergent expectations in contention;
+a negative intensity effect is common property, diagnostic of the burden
+rather than of any friction.
+
+\medskip
+\begin{center}
+  \small
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    & \multicolumn{2}{c}{Effect on $\Pr(\text{onset})$ of} & \\
+    \cmidrule(lr){2-3}
+    Bargain & tilt $\tau$ & intensity $\iota$ & Derived at \\
+    \midrule
+    Frictionless & \multicolumn{2}{c}{none: war never occurs} & Part~\ref{app:bargain} \\
+    Common-prior screen & $0$ interior; $\le 0$ at corner & $-$ (weakly) & \eqref{eq:riskreturn} \\
+    Commitment ceiling & $+$ & $-$ & \eqref{eq:cutpoint} \\
+    Divergent expectations & $+$ on $\tau > 0$; silent on $\tau \le 0$ & $-$ & \eqref{eq:wedge} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+\medskip
+
+The exclusion is of the screen as written.  The load-bearing caveats of
+Part~\ref{app:screen} mark the escape routes---a burden that scales rather
+than adds, an increment that falls disproportionately on the soft type,
+type-dependent sensitivity to the tilt---and a screening variant built along
+any of them is a legitimate rival, testable against data richer than these.
+
+Onset data cannot separate the two surviving frictions, and we do not ask
+them to.  We lead with commitment for its prominence across the civil-war
+record, its aptness to military intervention, where the calculus of
+victory really is altered \citep{walter2009}, and its economy of
+primitives: the ceiling's source is ready-made---settle, the external threat
+recedes, and with it whatever concession it extracted
+(Part~\ref{app:commit})---while divergence runs on the differing priors
+Part~\ref{app:diverge} must posit \citep{aumann1976}.  The
+divergent-expectations reading remains a live alternative rather than a
+rival.
+
+\subsection{Heterogeneous interveners}
+\label{app:hetero}
+
+One more consequence of Equation~\eqref{eq:EU} is worth setting down, because
+Section~\ref{sec:decision} uses it.  Nothing in Assumption~1 requires the
+weights to be uniform across interveners; uniformity entered with
+Assumption~3's unweighted aggregates.  Generalize them: let $w_i \ge 0$ and
+$b_i \ge 0$ be type-specific contest and burden loadings---how much
+intervener $i$'s entry would move the balance, and how much it would
+internationalize the war---and let
+\begin{gather*}
+  U_O(F) = \pi(\tau_w) - k(\iota_b), \\
+  \tau_w \equiv \sum_i w_i\bigl[\sigma_i(O) - \sigma_i(G)\bigr], \qquad
+  \iota_b \equiv \sum_i b_i\bigl[\sigma_i(O) + \sigma_i(G)\bigr].
+\end{gather*}
+The weighted aggregator is the assumption; the per-type weights are its
+arithmetic.  Expanding as before, $u_O^i(O) = \pi' w_i - k' b_i$ and
+$u_O^i(G) = -(\pi' w_i + k' b_i)$, with Assumption~3 the case $w_i = b_i =
+1$.  The government-side weight is nonpositive for every type, strictly
+negative wherever either loading is positive: no anticipated intervener
+emboldens rebellion from the government's side.  The opposition-side race, by
+contrast, may resolve differently for different interveners: a state whose
+involvement would internationalize the war more than tilt it ($k' b_i > \pi'
+w_i$) deters even from the opposition's side---the signature
+Section~\ref{sec:decision} reads in the major-power reversal.  The theory
+fixes the aggregate axes and the government channel; which interveners carry
+which weight is a question for measurement.
+
+\emph{Remark (what the model stakes).}  Three limits are built into the
+empirical exercise this model serves.  The shadow is estimated, not observed,
+so effect magnitudes arrive blurred by measurement error; its two channels
+co-move tightly, so only their sum and difference are stable; and the
+observable is onset, not the terms of the settlements that avert it, so the
+friction is detectable only through its trace.  The model is pitched at the
+altitude of signs deliberately---strong enough that a reversed sign would
+falsify it, no stronger than the measurement can carry.  And no claim is made
+that any one of these games is \emph{the} mechanism: the pair of comparative
+statics is what any account with a monotone contest, an intensity-borne
+burden, and either surviving friction implies.
+
 \section{Regan Intervention Coding Corrections}
 \label{app:coding}
 
@@ -164,6 +705,15 @@ spatial-weights and intervention-coding stages before combination.\footnote{%
 \section{Variable List}
 \label{app:varlist}
 
+Feature sources: material capabilities from COW v6 \citep{singer1987}
+and V-Dem v15 \citep{vdem2025}; ethnic structure from
+\citet{fearon2003} and \citet{cederman2010}; alliances
+\citep{gibler2009}; contiguity \citep{stinnett2002}; territorial
+disputes \citep{huth2003}; expected dispute outcomes
+\citep{carroll2019}; peace quality \citep{diehl2019}; UN General
+Assembly ideal points \citep{bailey2017}; and IGO membership
+\citep{pevehouse2020}.
+
 Table~\ref{tab:cy-vars} lists all country-year variables included in the analysis.
 Table~\ref{tab:dyad-vars} lists the dyadic variables added at the directed-dyad stage.
 
@@ -283,6 +833,25 @@ intervenes on behalf of the government, as produced by the fixed-point iteration
 described in Section~\ref{sec:constructing}.  An analogous expression gives \texttt{spat\_opp}
 using $\hat{\sigma}_j^*(2)$.
 
+A second pair of lags replaces the polity-similarity weighting with a
+\textit{contiguity} weighting, capturing the strategic coupling of states that
+border the same conflict.  Let $c_i = 1$ if potential intervener $i$ shares a
+land border with the host $A$ and $c_i = 0$ otherwise.  The contiguity-chain
+weight matrix is $W^{\text{chain}} = c\,c^{\top}$ with zeroed diagonal and row
+normalization, so that for a host-bordering intervener the lag is the mean
+predicted intervention propensity of the \textit{other} host-bordering states,
+and for a non-bordering intervener it is zero:
+
+\begin{equation*}
+\text{spat\_chain\_gov}_B = \sum_{j \neq B} W^{\text{chain}}_{Bj}\, \hat{\sigma}_j^*(1),
+\end{equation*}
+
+\noindent with \texttt{spat\_chain\_opp} defined analogously from
+$\hat{\sigma}_j^*(2)$.  Because states that border the same host are directly
+exposed to the same conflict, their intervention choices are strategically
+coupled through this classic conflict-diffusion channel.  These two lags and the
+ten polity-similarity and superpower lags make up the \FeatW{} spatial features.
+
 In the first training iteration (initialisation), $\hat{\sigma}_j^*(k)$ is
 replaced by the observed indicator $\mathbb{1}[y_j = k]$, where $y_j \in \{0, 1, 2\}$
 is the Regan-coded intervention outcome.  Subsequent iterations substitute the
@@ -306,44 +875,17 @@ and $XW$ (both), yielding 27 candidate models.  The NNLS stacking layer
 assigns weights to all 27 jointly.
 Table~\ref{tab:sl-components} reports out-of-fold PRL and NNLS weights
 for every learner broken out by feature set.
-Total weight by feature set: $X$ = 58.6\% (SD~8.1\%), $XW$ = 41.3\%
-(SD~8.1\%), $W$ $\approx$ 0\%.
+Total weight by feature set: $X$ = \WtX\% (SD~\WtXsd\%), $XW$ = \WtXW\%
+(SD~\WtXWsd\%), $W$ = \WtW\% (SD~\WtWsd\%).
 
-\begin{table}[t]
-  \centering
-  \small
-  \begin{tabular}{@{}l rrr rrr@{}}
-    \toprule
-    & \multicolumn{3}{c}{PRL (\%)} & \multicolumn{3}{c}{NNLS weight (\%)} \\
-    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
-    Learner & $X$ & $W$ & $XW$ & $X$ & $W$ & $XW$ \\
-    \midrule
-    MLP (100, 50)   &  33.4 & 14.5    & 30.9 & 24.9 & 0.0 & 19.5 \\
-    Random forest   &  18.9 & $-$29.9 & 16.5 & 22.6 & 0.0 & 16.0 \\
-    HGB (lr=0.05)   &  27.3 & 16.4    & 25.6 &  7.9 & 0.0 &  3.2 \\
-    HGB (lr=0.10)   & $-$44.4 & $-$44.6 & $-$76.3 & 2.4 & 0.0 & 1.3 \\
-    MLP (25)        &   1.3 & $-$93.4 &  1.3 &  0.8 & 0.0 &  0.8 \\
-    Multinomial     &  32.7 & 16.2    & 33.8 &  0.0 & 0.0 &  0.4 \\
-    Ridge           &  33.1 & 16.3    & 34.0 &  0.0 & 0.0 &  0.1 \\
-    Elastic net     &  33.2 & 16.3    & 34.5 &  0.0 & 0.0 &  0.0 \\
-    Lasso           &  34.1 & 16.4    & 35.1 &  0.0 & 0.0 &  0.0 \\
-    \midrule
-    \textbf{Super-learner} & \multicolumn{3}{c}{\textbf{47.3}} & \multicolumn{3}{c}{\textbf{100}} \\
-    \bottomrule
-  \end{tabular}
-  \caption{Out-of-fold PRL and NNLS weight for all 27 candidate models
-    (9 learners $\times$ 3 feature sets) and the super-learner ensemble.
-    $X$ = dyad features only; $W$ = spatial lags only; $XW$ = both.
-    All statistics average across 25 imputation draws.  Learners are
-    sorted by total weight ($X + W + XW$).}
-  \label{tab:sl-components}
-\end{table}
+\input{tables/sl-components}
 
 \subsection{Calibration}
 
-Because Stage~1 probabilities are summed across approximately 190 dyads to
+Because Stage~1 probabilities are summed across approximately
+\NumInterveners{} dyads to
 form the country-year shadow measure, a calibration error of $\delta$ per dyad
-compounds to roughly $190\delta$ in the aggregate---so even small
+compounds to roughly $\NumInterveners\,\delta$ in the aggregate---so even small
 miscalibration matters.  Figure~\ref{fig:sl-calibration} presents reliability diagrams
 for each outcome class, pooled across all 25 imputation draws.  In each
 panel, observations are sorted by predicted probability and divided into
@@ -366,6 +908,12 @@ under-prediction.
 
 \subsection{Fixed-Point Convergence}
 \label{app:fp}
+
+This appendix documents a Stage~1 \textit{training} diagnostic---whether the
+spatial lags fed to the classifier are self-consistent with the probabilities
+it predicts.  It is distinct from the universal Nash fixed point that constructs
+the country-year shadow (Section~\ref{sec:constructing}), which operates over all
+directed dyads rather than the training sample.
 
 \subsubsection{The Consistency Requirement}
 
@@ -390,17 +938,20 @@ requires $\mathbf{s} = W \hat{\mathbf{p}}$, a fixed-point condition.
 
 The main training loop (Section~\ref{sec:constructing}) runs five rounds of
 retrain-then-update, initializing $\mathbf{s}^{(0)}$ from the realized binary
-outcomes.  To assess whether five rounds are sufficient, I compute the mean
-absolute change in spatial lags between the final iteration and the
-initialization:
+outcomes.  Whether five rounds reach self-consistency is measured by the
+residual at the five-iteration approximation $\mathbf{s}^{(5)}$: the mean
+absolute gap between $\mathbf{s}^{(5)}$ and the weighted predictions
+$W\hat{\mathbf{p}}(\mathbf{s}^{(5)})$ it should equal, which is exactly the
+correction the first burnout pass applies:
 
 \begin{equation*}
-\Delta = \frac{1}{n} \sum_i |s_i^{(5)} - s_i^{(0)}|.
+\Delta^{(5)} = \frac{1}{n} \sum_i \bigl| [W\hat{\mathbf{p}}(\mathbf{s}^{(5)})]_i - s_i^{(5)} \bigr|.
 \end{equation*}
 
-Averaging across all onset rows and both lag channels, $\Delta \approx 0.007$
-after five iterations.  The theoretical tolerance threshold for self-consistency
-is $10^{-4}$; five iterations leave the spatial lags roughly 70 times above threshold.
+Averaged across all onset rows, both lag channels, and the 25 draws,
+$\Delta^{(5)} \approx \BurnoutStart$---roughly \BurnoutStartX{} times the
+$10^{-4}$ self-consistency threshold.  Five training rounds do not, on their
+own, reach self-consistency.
 
 \subsubsection{Frozen-Model Burnout}
 
@@ -425,9 +976,9 @@ probabilities for the same input due to tree-averaging over bootstrap samples).
 Empirical experiments confirm that $\Delta$ plateaus around $5 \times 10^{-4}$ and
 cannot be reduced further without retraining.
 
-Across all 25 imputation draws, burnout converges in 2--5 iterations (mean
-3.3), with final $\Delta$ ranging from $0.9 \times 10^{-4}$ to
-$4.7 \times 10^{-4}$---confirming that the plateau reflects irreducible
+Across all 25 imputation draws, burnout converges in \BurnoutLo--\BurnoutHi{} iterations (mean
+\BurnoutMean), with final $\Delta$ ranging from $\BurnoutDeltaLo \times 10^{-4}$ to
+$\BurnoutDeltaHi \times 10^{-4}$---confirming that the plateau reflects irreducible
 prediction noise rather than failure to converge.  Figure~\ref{fig:fp-convergence} shows the
 convergence trajectories: all draws exhibit rapid geometric decay (roughly
 halving each iteration) before plateauing at the tolerance threshold.
@@ -435,10 +986,10 @@ halving each iteration) before plateauing at the tolerance threshold.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.85\textwidth]{fig-fp-convergence.pdf}
-  \caption{Burnout convergence across 25 imputation draws.  Lines show the
-  per-iteration trajectory of mean $|\Delta\text{spatial lag}|$ for the 13 draws with
-  full iteration histories; dots mark endpoints for the remaining 12 draws.
-  Dashed red line: convergence tolerance ($5 \times 10^{-4}$).}
+  \caption{Burnout convergence across all 25 imputation draws.  Each line traces
+  the per-iteration mean $|\Delta\text{spatial lag}|$ from the five-iteration
+  approximation to convergence; dots mark endpoints.  Dashed line: convergence
+  tolerance ($5 \times 10^{-4}$).}
   \label{fig:fp-convergence}
 \end{figure}
 
@@ -458,7 +1009,7 @@ true equilibrium mapping, which no finite-sample estimator can guarantee.
 The weaker, defensible claim is as follows.  Realized outcomes are draws from
 \textit{some} equilibrium of the underlying game---they satisfy Nash consistency by
 assumption, since they were generated by the players.  But the equilibrium
-correspondence for a game of this scale (up to 190 potential interveners, each
+correspondence for a game of this scale (up to \MaxInterveners{} potential interveners, each
 choosing a mixed strategy) generically admits multiple equilibria, and different
 conflict cases may be near different connected components.  The realized binary
 outcomes provide only coarse information about which equilibrium each case is
@@ -491,106 +1042,154 @@ Stage~2) and not to re-estimate Stage~1.  The shadow measure therefore reflects
 the approximately-equilibrium spatial environment, while the classifier's
 weights remain from training on the realized-outcome initialization.
 
-\section{Comparison with the Cunningham Hierarchy}
-\label{app:cunningham}
+\section{Properties of the Shadow Measure}
+\label{app:properties}
 
-\citet{cunningham2016} measures anticipated government-biased
-intervention using the Lake security hierarchy, a cross-sectional index of
-U.S.~patron-client relationships.  Table~\ref{tab:cunningham} merges the hierarchy
-variable with the shadow measure on the common sample (6,973 country-years,
-1950--2005, restricted to non-missing hierarchy scores) and compares four
-logistic onset models.
+This appendix documents the descriptive behavior of $E^G$ and $E^O$,
+summarized in Section~\ref{sec:shadow-properties} of the main text.
 
-\begin{table}[t]
-  \centering
-  \begin{tabular}{@{}lrrrl@{}}
-    \toprule
-    Model & PRL & AUC & $\hat{\beta}_\text{proxy}$ & $p$ \\
-    \midrule
-    \multicolumn{5}{@{}l}{\textit{Panel A: Lake hierarchy (6,973 CY, 1950--2005)}} \\[3pt]
-    Baseline             & 11.1\% & 0.782 & ---            & ---  \\
-    Base + Hierarchy     & 11.2\% & 0.783 & $-$0.37 (0.47) & 0.43 \\
-    Entrants             & 12.9\% & 0.796 & ---            & ---  \\
-    Entrants + Hierarchy & 12.9\% & 0.796 & +0.05 (0.46)  & 0.92 \\
-    \midrule
-    \multicolumn{5}{@{}l}{\textit{Panel B: G\&M structural P5 (7,772 CY, 1946--2014)}} \\[3pt]
-    Baseline             & 10.5\% & 0.772 & ---            & ---  \\
-    Base + G\&M          & 10.5\% & 0.773 & +0.05 (0.62)  & 0.94 \\
-    Entrants             & 12.1\% & 0.787 & ---            & ---  \\
-    Entrants + G\&M      & 12.1\% & 0.787 & +0.16 (0.63)  & 0.80 \\
-    \bottomrule
-  \end{tabular}
-  \caption{Subsumption tests against existing intervention proxies.
-    Panel~A adds the Lake security hierarchy from
-    \citet{cunningham2016}; Panel~B adds the aggregate P5
-    intervention probability from \citet{gibilisco2022}.  Neither
-    proxy improves PRL or AUC when added to any specification, and
-    both proxy coefficients are effectively zero conditional on the
-    shadow variables.  Samples differ because the Lake hierarchy
-    covers 1950--2005 and G\&M covers 150 countries over 1950--1999.}
-  \label{tab:cunningham}
-\end{table}
+Before turning to the onset analysis, I examine the descriptive properties
+of $E^G$ and $E^O$ to establish that they behave as the theory predicts.
 
-Neither proxy adds to the Baseline model (PRL and AUC are
-unchanged in both panels), and conditional on the shadow variables both
-coefficients are effectively zero.  The shadow measure completely
-subsumes whatever onset-relevant information these proxies contain.
-This is consistent with Figure~\ref{fig:hierarchy}: the classifier
-recovers the patron-client signal embedded in the Lake hierarchy and
-the P5 strategic-game estimates while adding substantial variation from
-non-superpower interveners, bilateral relationships, and the spatial
-environment.
+The dyad-level predictions reveal a structural asymmetry between the two
+sides of intervention.  The highest predicted probabilities of
+government-biased intervention involve superpowers projecting influence into
+client states---the United States supporting the Philippines in 1972
+($\hat{p}_\text{gov} = \pGovMax$), Laos in 1962, and Cambodia in 1971.  For
+opposition-biased intervention, the picture shifts: the maximum is Israel
+opposing the Syrian government in 1982 ($\hat{p}_\text{opp} = \pOppMax$), followed
+by Bulgaria targeting Greece in 1946 and Kuwait targeting Iraq in 1991,
+and nine of the ten highest-ranked opposition predictions involve non-P5
+interveners.  A measurement framework restricted to P5 states
+would miss the majority of the opposition-biased shadow.
+
+Table~\ref{tab:shadow-dyads} makes this concrete for three canonical onsets, reporting
+the five states to which the classifier assigns the highest government- and
+opposition-biased intervention probabilities alongside an indicator of whether
+the state actually intervened in that direction.
+
+\input{tables/shadow-dyads}
+
+Across the three cases, \DyadHits{} actual interventions appear in the top five
+on the correct side---and in each case, restricting the measure to P5 states
+would discard the single most important opposition-biased intervener: Zaire
+in Angola, Somalia in Ethiopia, Pakistan in Afghanistan.\footnote{%
+  The United States appears in the top five government-biased predictions for
+  all three cases, yet actually intervened on the opposition side in Angola and
+  Afghanistan.  The model assigns substantial probability mass to \textit{both} sides
+  but defaults toward government-biased intervention because that is the modal
+  US posture across the full sample.  This directional ambiguity for superpowers
+  is one reason the country-year aggregation is preferable to raw dyad-level
+  predictions: summing across all potential interveners preserves the correct
+  signal that these countries faced unusually high total intervention pressure,
+  even where the classifier hedges on which side a specific superpower would take.}
+
+Figure~\ref{fig:shadow-kde} shows the cross-sectional distribution of $E^G$ and $E^O$
+across all country-years.  Both measures are heavily right-skewed: the
+median country-year faces modest intervention expectations, but a long
+right tail captures the handful of states embedded in dense alliance
+networks and superpower competition.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.85\textwidth]{fig-shadow-hierarchy.pdf}
-  \caption{$E^G$ (asinh, trimmed) versus US security hierarchy score
-    from the Lake hierarchy data used in \citet{cunningham2016}.  Each point is
-    a country-year (1950--2005); binned means show the conditional trend.
-    The correlation is positive ($r = 0.23$) and stronger post-Cold War
-    ($r = 0.35$), confirming that the classifier recovers the
-    patron-client signal while adding substantial variation from
-    non-superpower interveners.}
-  \label{fig:hierarchy}
+  \includegraphics[width=0.85\textwidth]{fig-shadow-kde.pdf}
+  \caption{Kernel density estimates of $E^G$ and $E^O$ across all
+    country-years (1946--2014), averaged across 25 imputation draws.}
+  \label{fig:shadow-kde}
 \end{figure}
 
-\section{Likelihood-Ratio Tests}
-\label{app:lr-tests}
+Figure~\ref{fig:shadow-ts} traces the temporal dynamics for three of the most
+heavily internationalized civil wars of the Cold War.  Beyond magnitude, the
+shadow recovers \textit{direction}---which outside powers line up on which
+side.  Angola is the clearest case: at the 1976 onset the government-side
+shadow ($E^G = \ShAngolaG$) is anchored by Cuba and the Soviet Union, the
+MPLA's patrons, while the opposition-side shadow ($E^O = \ShAngolaO$) loads on
+Zaire, South Africa, and the United States---the external backers of the FNLA
+and UNITA.  Ethiopia shows the same structure through the 1978 realignment:
+Cuba and the Soviet Union again anchor the government side for the Derg
+($E^G = \ShEthiopiaG$), while Somalia drives the opposition side in the Ogaden war.  Afghanistan illustrates a regime switch: the 1978 Saur Revolution
+lifts the government-side shadow, but by 1979 the opposition side overtakes it
+($E^O = \ShAfghanO$ vs.\ $E^G = \ShAfghanG$), capturing the surge of mujahideen
+support from Pakistan, Iran, and the United States against a Soviet-backed
+government.  In every case the shadow concentrates on the historically correct
+interveners rather than diffusing across the system---evidence that it tracks
+the strategic environment, not merely the onsets on which Stage~1 is trained.
 
-Table~\ref{tab:lr-tests} reports likelihood-ratio tests for the nested model
-hierarchy.  Two sets of tests are presented: each specification against the
-Baseline (do the shadow variables as a group improve fit?) and each
-type-disaggregated specification against Entrants (does type-specific
-decomposition add beyond the aggregate shadow?).
-
-\begin{table}[t]
+\begin{figure}[t]
   \centering
-  \begin{tabular}{@{}l rr rrrr@{}}
-    \toprule
-    & & & \multicolumn{2}{c}{vs.\ Baseline} & \multicolumn{2}{c}{vs.\ Entrants} \\
-    \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-    Model & LL & $k$ & LR & $p$ & LR & $p$ \\
-    \midrule
-    Baseline       & $-$799.5 & 13 & --- & --- & --- & --- \\
-    Entrants       & $-$783.2 & 15 & 32.7 & ${<}0.001$ & --- & --- \\
-    Powers         & $-$761.6 & 17 & 75.8 & ${<}0.001$ & 43.1 & ${<}0.001$ \\
-    Neighbors      & $-$760.0 & 17 & 79.1 & ${<}0.001$ & 46.4 & ${<}0.001$ \\
-    Coethnics      & $-$775.1 & 17 & 48.8 & ${<}0.001$ & 16.2 & ${<}0.001$ \\
-    Rulers         & $-$783.2 & 17 & 32.7 & ${<}0.001$ & 0.03 & 0.98 \\
-    Rivals (bin)   & $-$759.9 & 17 & 79.2 & ${<}0.001$ & 46.5 & ${<}0.001$ \\
-    Rivals (cts)   & $-$757.5 & 17 & 84.0 & ${<}0.001$ & 51.3 & ${<}0.001$ \\
-    DOE            & $-$782.3 & 17 & 34.4 & ${<}0.001$ & 1.8 & 0.41 \\
-    Full           & $-$690.5 & 27 & 217.9 & ${<}0.001$ & 185.3 & ${<}0.001$ \\
-    \bottomrule
-  \end{tabular}
-  \caption{Likelihood-ratio tests for nested onset specifications.
-    LL = maximized log-likelihood; $k$ = number of parameters (including
-    constant).  The ``vs.\ Baseline'' column tests whether adding shadow
-    variables improves fit (df $= k - 13$); the ``vs.\ Entrants'' column
-    tests whether type-disaggregated interactions improve on the aggregate
-    shadow (df $= k - 15$).  The shadow variables are jointly significant
-    at $p < 0.001$ in every specification.  Colonial ties (Rulers) and
-    military balance (DOE) add nothing beyond the aggregate shadow.}
-  \label{tab:lr-tests}
-\end{table}
+  \includegraphics[width=0.85\textwidth]{fig-shadow-ts.pdf}
+  \caption{Shadow measure time series ($E^G$ and $E^O$) for three countries
+    with well-documented intervention environments.  Probabilities averaged
+    across 25 imputation draws.}
+  \label{fig:shadow-ts}
+\end{figure}
 
+$E^G$ correlates positively with both existing measures of anticipated
+intervention: the Lake security hierarchy used by \citet{cunningham2016}
+($r = \CorrLake$, $n = \NLake$) and the structural P5 intervention probabilities
+estimated by \citet{gibilisco2022} ($r = \CorrGM$, $n = \NGM$).  The stronger
+correlation with G\&M is expected---both capture intervention propensity
+directly---while the moderate hierarchy correlation reflects the fact that
+US dominance is only one component of the broader intervention environment.
+
+\section{Full Second-Stage Estimates}
+\label{app:full-model}
+
+Table~\ref{tab:direction-full} reports the complete \textit{Entrants} onset
+model whose two shadow coefficients are summarized, in the identified
+net-tilt parameterization, in Table~\ref{tab:direction}.  Coefficients and
+intervals are computed by the $T \times P$ procedure, so the intervals
+propagate the shadow's measurement uncertainty and are correspondingly wide
+for the collinear shadow channels; the controls are conventionally estimated.
+
+\input{tables/direction-full}
+
+% Source: scripts/mh_chisq.py, scripts/spike_rf_significance.py, scripts/rfsig_perdraw.py;
+% results/spike/mh_chisq_{calib,focal,40pt,joint_seeds}.parquet, rfsig_summary.parquet,
+% rfsig_perdraw.parquet (seeded, committed).
+\section{Predictive-Significance Tests}
+\label{app:pstests}
+
+Table~\ref{tab:dropcol} scores each covariate by what its removal costs a
+held-out forecast.  This section reports the formal counterpart: the
+prediction-difference test of \citet{mentchhooker2016}, the procedure
+\citet{mcalexandermentch2020} bring to onset data.  Trees are built on
+subsamples ($k = 75$ of $n = \OosN$; minimum split 3), so ensemble
+predictions are asymptotically normal U-statistics with estimable covariance;
+the test compares an ensemble built on the observed data against one built
+with the focal columns permuted, evaluating both at $N$ held-out test points
+and referring $\hat{D}' \hat{\Sigma}_D^{-1} \hat{D}$ to $\chi^2_N$.
+Following the original authors' discipline, the tuning was validated on
+calibration anchors before any shadow test was run: across \MhNoiseReps\
+pure-noise focal columns the $p$-values are near-uniform (mean
+$\MhNoiseMean$; $\MhNoiseHits$ at or below $0.05$, the nominal rate), and a
+synthetic strong signal is rejected decisively
+($\chi^2_{20} = \MhSynthStat$).
+
+Verdicts at any single set of test points are variable in a rare-event
+outcome---the original authors note the test's sensitivity to test-point
+location---so the joint test of the two shadow channels, the appropriate
+test for a collinear pair, was run across ten independent test-point draws
+(five each at $N = 20$ and $N = 40$) and combined by twice the median
+$p$-value \citep{meinshausen2009}.  It rejects at every configuration:
+\MhJointTight\ draws at $p \le 0.005$, all ten at $p \le \MhJointMaxP$,
+combined $p \approx \MhJointComb$ at both test-set sizes.  The marginal
+tests are configuration-sensitive in exactly the way collinearity
+predicts---each channel's verdict depends on which test points happen to
+separate it from its twin---the same pathology \citet{mcalexandermentch2020}
+document for the fractionalization measures in the Fearon--Laitin model, and
+the empirical motivation for working in the tilt and intensity combinations
+of Section~\ref{sec:direction}.  The structural controls do not reject
+(income $p = \MhGdpP$, population $p = \MhPopP$).
+
+A conventional permutation counterpart agrees: refit the ensemble under each
+of $99$ draws from the focal columns' permutation null, score each refit out
+of fold, and compare the observed average precision to that null---the
+brute-force analogue of the computationally efficient test of
+\citet{coleman2022}.  This version permits the generated-regressor honesty
+the asymptotic machinery does not contemplate: run separately on each of the
+\PdDraws\ measurement draws, the joint test rejects at $p \le 0.05$ in
+\PdJointDraws\ (median $\PdJointMed$, worst $\PdJointMax$), and the marginals
+clear conventional thresholds in most draws ($E^G$ in \PdEgovHits\ of
+\PdDraws, $E^O$ in \PdEoppHits) while remaining draw-sensitive.  The
+measurement spread does not rescue the null.

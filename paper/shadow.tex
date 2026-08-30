@@ -18,6 +18,7 @@
 
 % ---- Graphics and tables ----
 \usepackage{graphicx}
+\usepackage{tikz}
 \graphicspath{{figures/}}
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -26,6 +27,9 @@
 % ---- Citations (Chicago author-date) ----
 \usepackage{natbib}
 \bibliographystyle{chicago}
+\usepackage{bibunits}
+\defaultbibliographystyle{chicago}
+\defaultbibliography{references}
 
 % ---- Cross-references ----
 \usepackage[colorlinks=true, citecolor=blue, linkcolor=red, urlcolor=blue]{hyperref}
@@ -39,6 +43,9 @@
 \author{Robert J. Carroll}
 \date{\today}
 
+% ---- Generated numbers (auto-exported; see scripts/export_numbers.py) ----
+\input{generated/numbers}
+
 \begin{document}
 
 % ---- Title page ----
@@ -47,26 +54,23 @@
 
 \begin{abstract}
 
-Theory predicts that anticipated third-party intervention shapes the
-calculus of rebellion, yet no measure of expected intervention covers
-the full population of potential interveners.  I construct one using a
-two-stage learned-proxy design: a machine-learning ensemble predicts
-the probability and direction of intervention for each directed
-dyad-year; predictions are aggregated to a country-year shadow
-disciplined by a Nash fixed-point condition.  Expected
-government-biased intervention deters onset while expected
-opposition-biased intervention encourages it.  The two shadow
-variables are jointly significant ($p < 0.001$) despite wide
-individual confidence intervals driven by inter-shadow collinearity,
-and the directional pattern is robust across specifications,
-measurement draws, and a country fixed-effects estimator.  The shadow
-subsumes two leading existing proxies and carries out-of-sample
-predictive content.
+Anticipated third-party intervention shapes the decision to rebel, yet
+no measure covers the full population of potential interveners.  I construct one: a machine-learning ensemble
+predicts intervention probability and direction for every dyad-year
+(1946--2014); a fixed point makes them mutually consistent; their
+sum is the country-year shadow.  Added to a standard onset model, it
+improves out-of-sample prediction, sharply once resolved by intervener
+type, and encompasses the leading measures, each limited to one side of
+intervention or the major powers.  In one bargaining framework, three
+frictions stake predictions on its two axes.  Onset falls with the
+intensity and rises with the tilt toward the
+opposition---a pattern easier to square with limited commitment or
+divergent expectations than with the standard screen.
 \end{abstract}
 
 \noindent\textbf{Keywords:} civil war, military intervention, machine learning, learned proxy, onset
 
-\noindent\textbf{Word count:} 7,635
+\noindent\textbf{Word count:} 8,747  % scripts/wordcount.sh: texcount over the five body sections (generated tables excluded) + the main reference list (bu1.bbl). The Online Appendix that follows carries its own reference list (bu2.bbl), excluded per PSRM's online-appendix rule.
 
 \vfill
 \begin{center}
@@ -86,13 +90,14 @@ predictive content.
 \clearpage
 \setcounter{page}{1}
 
+\begin{bibunit}
 \input{sections/introduction}
 \input{sections/motivation}
 \input{sections/constructing}
 \input{sections/decision}
 \input{sections/conclusion}
-
-\bibliography{references}
+\putbib
+\end{bibunit}
 
 % ---- Online Appendix ----
 \clearpage
@@ -103,6 +108,10 @@ predictive content.
 \end{center}
 
 \appendix
+\begin{bibunit}
+\renewcommand{\refname}{Online Appendix References}
 \input{sections/appendix}
+\putbib
+\end{bibunit}
 
 \end{document}

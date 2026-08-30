@@ -5,13 +5,12 @@
 A growing body of theory predicts that \textit{anticipated} third-party
 intervention shapes civil war onset
 \citep{cetinyan2002,cunningham2016,dudley2024,gibilisco2022,kuperman2008,kyddstraus2013,lango2023,sambanis2020},
-yet the quantity has never been measured systematically.  No existing measure
-covers the full population of potential interveners, varies annually with
-shifting alliances and foreign policy alignments, and treats intervention
-direction---government-biased versus opposition-biased---as the primary
-quantity of interest.  This paper constructs such a measure and uses it
-to test the hypothesis that the shadow of intervention deters and
-emboldens.
+yet we lack the measure it calls for: one that covers the full population of
+potential interveners, varies annually with shifting alliances and
+foreign-policy alignments, and treats direction---government- versus
+opposition-biased---as a quantity in its own right.  This paper constructs it,
+and uses it to show that the decision to fight turns on the direction of the
+anticipated intervention environment and is checked by its intensity.
 
 The construction is the core contribution.  A machine-learning ensemble
 trained on the \citet{regan2000} dataset of military
@@ -20,79 +19,88 @@ year, the probability and direction of intervention.  Dyad-level
 predictions are aggregated across all potential interveners to produce a
 country-year shadow, disciplined by a Nash fixed-point condition
 requiring each state's predicted probability to be self-consistent as an
-input to the others' predictions.  The resulting measures are tested in
-a standard country-year onset framework \citep{fearon2003}: expected
-government-biased intervention enters negatively (deterrence), expected
-opposition-biased intervention enters positively (emboldening), with the
-directional pattern robust across specifications, measurement draws, and
-a country fixed-effects estimator.
+input to the others' predictions.
 
-The closest existing approaches each sacrifice scope for
-identification.  \citet{cunningham2016} uses the Lake
-security hierarchy as a proxy for anticipated government-biased
-intervention---a static, unidirectional measure restricted to the US
-patron-client channel.  The present paper generalizes in three
-directions: it covers all potential interveners, both sides of
-intervention, and derives probabilities from a calibrated classifier
-rather than structural position.
-\citet{gibilisco2022} derive equilibrium intervention
-expectations from a structural game among the P5, gaining clean
-identification at the cost of restricting the player set to a size that
-keeps joint-game estimation tractable.  In the Regan data, P5 states
-account for fewer than half of all military interventions; the remaining
-53 intervening states---neighbors, coethnics, regional rivals, Cold War
-proxies---represent the majority of actual deployments and are driven by
-logics qualitatively different from the global-order interests that
-animate P5 behavior.  \citet{lango2023} develops a
-formal model in which the threat of rebel-sided intervention can
-simultaneously deter onset---by compelling governments to concede---and
-encourage it---by raising rebels' expected return from fighting; the
-utility parameters in the present framework can represent these
-nonmonotone effects.
+The measure is built at the level of intervention decisions---who is expected
+to intervene, and on whose side.  Whether it bears on onset is a separate
+question, and the way to ask it is to carry the shadow into a standard
+country-year onset logit \citep{fearon2003}.  It earns its place there: added
+to the structural baseline, the shadow improves out-of-sample prediction---
+modestly in aggregate, and substantially once resolved by intervener type---and
+it encompasses the leading existing measures, each capturing only one side of
+intervention or the major powers.  Only once it predicts is there reason to
+read its direction.  The bargaining literature offers three common accounts of
+why a war both sides could avoid happens anyway: the government's strength or
+resolve is private, and the opposition's demand screens it; the government
+cannot credibly keep tomorrow the concession it makes today; or the two sides
+read the odds of intervention itself differently.  Worked through a single
+framework, the three stake different predictions on the shadow's two
+axes---the tilt registering which way a war would lean, the intensity the
+burden it would impose on those who fight it.  The estimates lean among these
+accounts rather than decide between them: onset falls with the intensity in
+every measurement draw and rises with the tilt in a clear majority, a pattern
+the standard screening model does not produce and the other two do.  The
+evidence points away from the screen and toward limited commitment or divergent
+expectations, without separating those two.
 
-This paper takes a learned-proxy approach: a flexible first-stage model
-constructs the latent quantity, and a parametric second-stage model tests
-the theory.  This two-stage design is an increasingly common way to
-bring machine learning into social science inference
-\citep{knoxlucascho2022}, and arguably the least controversial
-\citep{moruccispirling2024}: the ensemble does the measurement work it is
-suited for, while the onset regression retains the interpretability that
-causal claims require.  The design nests the structural functional
-form---the unpenalized multinomial logit in the ensemble library directly
-corresponds to the softmax best-response function of
-\citet{gibilisco2022}---so whether that parametric
-assumption fits the data is answered empirically rather than imposed by
-construction.  (It earns less than one percent of the ensemble weight;
-the data strongly prefer nonparametric alternatives.)
+The pieces of this account are not new; what has been missing is holding them
+together.  \citet{cunningham2016} established the government side---the
+prospect of great-power backing for an incumbent can deter a rebellion
+outright, shifting the expected balance so far that no challenge pays.
+\citet{lango2023}, whose model of civil war fought in the shadow of
+intervention is the most similar to the one developed here, established the
+opposition side---rebels weigh anticipated outside support, and its prospect
+emboldens the challenge, even as, pushed far enough, it can induce a government
+to concede rather than fight.  \citet{gibilisco2022} brought structural
+estimation to the question, recovering intervention expectations from an
+equilibrium among the major powers and finding their effects to run in opposite
+directions for different powers---a heterogeneity that foreshadows one of the
+results below.  Each holds a piece: one side of intervention, or one set of
+sponsors---but the ones left out are not a fringe.  In these data, fewer than
+half of the interventions---\PFivePct\ percent---are the work of the major
+powers; the rest fall to neighbors, coethnics, rivals, and Cold War proxies.
+None of these accounts holds both sides together across that full population,
+and the gap is not incidental.  Because a country that draws government-biased
+intervention tends to draw the opposition-biased kind as well, the net tilt of
+the anticipated environment comes into view only when both sides are measured
+at once, across everyone, and over time.  The field has
+seen the two forces one at a time; seeing their difference has required
+measuring them together.
+
+Measuring that environment is the hard part, and it fixes the method.  The
+quantity is an expectation---for every potential intervener, on each side, in
+each year, the probability that it takes a hand---and no general theory of
+intervention tells us which states may be dropped from the roster, or which
+side left out of the ledger.  What remains is a large and noisy classification problem, and the
+task at the measurement stage is to get the probabilities right.  This is the natural home of flexible, predictive
+machinery, and it is the opposite of the choice a structural analysis makes:
+rather than pare the problem to a set small enough to solve exactly, the
+learned-proxy approach keeps the whole of it and brings the strongest available
+predictor to bear, holding interpretation for the second stage
+\citep{knoxlucascho2022, moruccispirling2024}.  The structural route is not
+discarded but embedded---the softmax best response of \citet{gibilisco2022}
+enters the ensemble library as one candidate among many, and the data award it
+\WtMultinom\ percent of the weight, a real but minor share, the flexible
+learners carrying the rest.  Whether that parametric form fits is thus settled
+empirically rather than assumed.
 
 The learned-proxy approach has well-documented pitfalls.
 \citet{knoxlucascho2022} catalog these systematically:
 measurement-stage uncertainty is routinely ignored, proxy quality is
 asserted rather than tested, and the disconnect between prediction and
-inference is papered over.  This paper follows their recommendations
-closely: Stage~1 performance is validated out-of-fold across 25
-imputation draws; measurement uncertainty is propagated into Stage~2 via
-a two-stage pairs cluster bootstrap that averages across all 25 draws;
-calibration is verified by reliability diagrams; and a labeled-only
-robustness check confirms that the onset estimates are not driven by
-out-of-sample extrapolation.  The honest accounting of generated-regressor
-uncertainty is itself a result: the corrected standard errors are roughly
-2.9--3.5 times larger than naive MLE output, with a variance decomposition
-showing that approximately 88--92\% of the total coefficient variance originates
-in the measurement stage and only 8--12\% from primary-analysis sampling.  The
-measurement model, not the regression, is the binding source of
-uncertainty---precisely the situation \citet{knoxlucascho2022} warn about.
-The two shadow variables are correlated at $r = 0.94$, which inflates
-individual confidence intervals, but tested jointly they reject the
-baseline at $p < 0.001$; the directional pattern holds across all 25
-measurement draws, ten specifications, and country fixed effects.
-The shadow subsumes both the Lake security hierarchy
-\citep{cunningham2016} and the \citet{gibilisco2022} structural P5
-estimates: neither adds explanatory power once the shadow variables are
-included.
+inference is papered over.  This paper follows their recommendations: out-of-fold validation
+across the 25 imputation draws, measurement uncertainty propagated into
+Stage~2 by a pairs-cluster bootstrap over all of them, calibration verified
+by reliability diagrams.  The honest accounting is itself a result:
+\DirMeasLo--\DirMeasHi\ percent of the coefficient variance originates in
+the measurement stage, not in primary-analysis sampling---the measurement
+model, not the regression, is the binding source of uncertainty, precisely
+the situation \citet{knoxlucascho2022} warn about.
 
-The paper proceeds as follows.  Section~\ref{sec:motivation} develops the theoretical
-framework linking intervention expectations to the onset decision.
-Section~\ref{sec:constructing} describes the construction and validation of the
-shadow measure.  Section~\ref{sec:decision} presents the onset analysis, including
-measurement-corrected inference and heterogeneous-utility extensions.
+The paper proceeds as follows.  Section~\ref{sec:motivation} traces three
+common accounts of bargaining breakdown through a single framework and
+develops the expectations they stake on the shadow's two axes.
+Section~\ref{sec:constructing} constructs and validates the shadow measure.
+Section~\ref{sec:decision} turns to onset: it establishes that the shadow
+predicts out of sample before weighing the mechanisms against one another, then
+asks which interveners carry the effect.

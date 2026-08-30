@@ -5,137 +5,173 @@
 \section{Intervention and the Onset Decision}
 \label{sec:motivation}
 
-What does it mean, formally, for an opposition group to act in the shadow
-of intervention?  This section develops a model of the onset decision that
-derives the functional form that intervention expectations must take to be
-both theoretically coherent and empirically tractable.
+\subsection{The Shadow of Intervention}
 
-\subsection{The Model}
+A rebellion is launched in anticipation of how the world will answer it.
+Before the first shot, a would-be opposition weighs not only the government in
+front of it but the outside powers that might join the fight---some on its own
+behalf, some on the incumbent's.  This is the shadow of intervention
+\citep{cetinyan2002}, and two of its effects are by now well established.
+Anticipated \emph{government}-biased intervention deters: a challenger that
+expects outside backing to make the incumbent all but impossible to defeat
+sees little gain in fighting, and does not rebel \citep{cunningham2016}.
+Anticipated \emph{opposition}-biased intervention runs the other way, lowering
+the expected cost of rebellion and raising its odds of success, and so
+emboldens the challenge \citep{kuperman2008, thyne2006, qiu2022}.
+
+Why should anticipation touch the decision to fight at all, rather than merely
+the terms of a settlement?  Because a rebellion is not a unilateral leap: a
+government that sees a credible challenge coming can buy it off with
+concessions, so onset is better read as the breakdown of a bargain than as an
+act taken in isolation \citep{walter2009}.  Were that bargain always available,
+the shadow would move the division of the stakes without changing whether war
+occurs.  That it moves onset is the trace of a friction in the bargain, and
+rather than pick one in advance, this paper traces three common candidates
+through a single bargaining framework:
+\begin{itemize}
+  \item \emph{Private information.}  The government's strength or resolve is
+    its own to know, and the opposition's demand screens it---the classic
+    risk--return account of war \citep{fearon1995}.
+  \item \emph{Limited commitment.}  A government cannot credibly promise to
+    honor tomorrow the concession that today's external threat would wring
+    from it, so a peace that would avert war today is not believed to hold
+    \citep{walter2009, powell2006}.
+  \item \emph{Divergent expectations.}  The two sides read the shadow itself
+    differently: the government and the rebels need not hold the same
+    estimate of the odds of intervention, and a side that expects help grows
+    optimistic and refuses a settlement it ought to accept
+    \citep{cunningham2016, cetinyan2002}.
+\end{itemize}
+The three make overlapping but distinct predictions---they converge where any
+costly-war bargain must, and part exactly where the data can look---and the
+analysis lets the estimates weigh among them (Section~\ref{sec:decision}).
+
+\subsection{Tilt and Intensity}
+
+Government- and opposition-biased intervention rarely move one at a time.  A
+country that draws anticipated intervention of one kind tends to draw the
+other: the features that make
+outside powers likely to back a government---its strategic value, its
+alignments, its neighborhood---make them likely to back its challengers too.
+What distinguishes one anticipated environment from another is therefore less
+the sheer amount of expected intervention than two things at once: which way it
+leans, and how heavy it is---its \emph{tilt} toward the opposition and its
+\emph{intensity}.
+
+The tilt governs the contest.  A net lean toward the opposition raises the
+rebels' prospects and emboldens them; a net lean toward the government does the
+reverse---the deterrent and emboldening logics above are the two directions of
+a single axis.
+
+The intensity governs the burden.  Because the two sides move together, a
+high-intensity environment is one in which a war would draw heavy involvement
+on \emph{both} sides at once---a competitive, internationalized war.  Such wars
+are the hard ones to end: each added outside stakeholder with its own
+preferences narrows the range of settlements all parties would accept, and
+balanced support locks the fighting into stalemate \citep{cunningham2006,
+cunningham2010, balchlindsayjoyce2008}.  A challenger who foresees such an
+environment foresees a long, grinding war, and that prospect deters.  Because
+states in fact intervene where wars are hardest to begin with \citep{gent2008,
+gilligansergenti2008}, it is the \emph{anticipated} environment, not the
+realized one, that bears on the decision to fight---and anticipated competing
+intervention is itself associated with longer wars
+\citep{akcinarogluradziszewski2005}.\footnote{These studies estimate the
+duration of wars that occurred; that a rebel \emph{anticipating} such a war is
+deterred from starting one is the inference drawn here, not a finding they
+report.}
+
+The two forces enter the value of fighting with a built-in asymmetry.  On
+the government side they agree: outside backing for the incumbent both
+worsens the rebels' odds and heightens the burden of the war they would
+fight.  On the opposition side they compete: outside backing improves the
+rebels' odds but heightens the burden of the very war in which the help would
+arrive.  Whatever the bargain does with these values, then, government-biased
+expectations should deter, while the opposition channel is a race the war
+value alone does not resolve---a question the theory hands to the data.
+
+The bargain is what turns war values into onset, and it is where the three
+mechanisms part company.  All three expect onset to fall with the intensity:
+in a bargain over a costly war, a heavier war leaves more for peace to save,
+whichever friction is at work.  The tilt divides them.  Under the screen as
+written---whatever the government's private object---the balance of power
+passes into the demand and out of the decision to fight; no positive tilt
+effect emerges.  Under limited commitment or divergent readings of the
+shadow, onset rises with the tilt.  A positive tilt effect in the data would
+therefore do more than sit comfortably with bargaining logic; it would point
+away from the screen---which as written could not have produced it---and toward
+the other two.
+Appendix~\ref{app:model} derives each mechanism's expectations and tabulates
+the comparison.
+
+\subsection{From Logic to Measurement}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.85\textwidth]{ntree.pdf}
-  \caption{Motivating formal model.}
+  \begin{tikzpicture}[x=1cm, y=1cm,
+      dec/.style={circle, draw, inner sep=1.5pt, minimum size=16pt},
+      term/.style={circle, fill, inner sep=1.6pt},
+      lab/.style={font=\small\itshape}]
+    % Move 1: challenge or status quo
+    \node[dec] (O1) at (0, 0) {$O$};
+    \node[term, label=below:{$SQ$}] (SQ) at (-2.2, -1.4) {};
+    \node[dec] (O2) at (2.2, -1.4) {$O$};
+    \draw (O1) -- node[lab, above left, pos=.55] {$N$} (SQ);
+    \draw (O1) -- node[lab, above right, pos=.55] {$F$} (O2);
+    % Move 2: the ultimatum
+    \node[dec] (G) at (2.2, -2.9) {$G$};
+    \draw (O2) -- node[lab, right, pos=.5] {$s \in [0,1]$} (G);
+    \node[term, label=below:{$(s,\, 1-s)$}] (settle) at (0.2, -4.3) {};
+    \node[term, label=right:{\small\itshape war}] (war) at (4.2, -4.3) {};
+    \draw (G) -- node[lab, above left, pos=.55] {accept} (settle);
+    \draw (G) -- node[lab, above right, pos=.55] {reject} (war);
+    % Move 3: the intervener subgame (simultaneous), reached only in war
+    \draw[dotted, thick] (war) -- (4.2, -5.4);
+    \foreach \x/\nm in {1.7/I_1, 4.2/I_2, 6.7/I_n} {
+      \node[dec, minimum size=15pt] (i\nm) at (\x, -5.9) {$\nm$};
+      \node[term] (a\nm) at (\x - 0.85, -7.2) {};
+      \node[term] (b\nm) at (\x, -7.2) {};
+      \node[term] (c\nm) at (\x + 0.85, -7.2) {};
+      \draw (i\nm) -- node[lab, above left, pos=.6] {$O$} (a\nm);
+      \draw (i\nm) -- node[lab, right, pos=.6] {$N$} (b\nm);
+      \draw (i\nm) -- node[lab, above right, pos=.6] {$G$} (c\nm);
+    }
+    \node at (5.45, -5.9) {$\cdots$};
+  \end{tikzpicture}
+  \caption{The onset game.  The opposition challenges ($F$) or accepts the
+    status quo ($N$); a challenge carries a demand $s$, which the government
+    accepts---a settlement---or rejects, in which case war follows, fought in
+    the environment set by the $n$ potential interveners' simultaneous
+    choices.}
   \label{fig:ntree}
 \end{figure}
 
-The decision problem is depicted in Figure~\ref{fig:ntree}.  An opposition group $O$
-chooses whether to Fight ($s_O = F$) or Not fight ($s_O = N$).  Should it
-not fight, the game ends at the status quo $SQ$.  If it fights, $n$
-potential interveners simultaneously choose actions $s_i \in \{O, N, G\}$---
-opposition-biased, non-intervention, or government-biased---and the
-combined profile $s \in S = \{O, N, G\}^n$ determines the international
-environment the opposition faces.
+The logic is deliberately spare, and one game form carries all three
+mechanisms.  Reduced to its frame, the decision is a would-be rebel weighing
+whether to challenge in anticipation of how the outside world---every state
+that might back the government, back the opposition, or stand aside---would
+answer the war that follows (Figure~\ref{fig:ntree}).  The mechanisms differ
+only in what the bargain must survive: private strength or resolve, promises
+that cannot bind, readings of the shadow that do not agree.  The tilt and intensity of
+the environment are summaries of the anticipated answer, aggregated across
+everyone who might act; the appendix works the game's payoffs and equilibria
+under each friction, and here its structure is enough.
 
-Each potential intervener $i$ has a utility function $u_i : S \rightarrow \mathbb{R}$
-over profiles.  Under expected utility, let $\sigma_i$ be a probability
-measure over $\{O, N, G\}$, and let
-$U_i(\sigma) = \sum_{s' \in S} u_i(s') \prod_j \sigma_j(s'_j)$.
-A Nash equilibrium $\sigma^*$ of the intervention subgame satisfies
-$U_i(\sigma_i^*, \sigma_{-i}^*) \geq U_i(\sigma'_i, \sigma_{-i}^*)$
-for every $\sigma'_i$ and every $i$.  The equilibrium profile feeds back
-to the opposition, whose expected utility of fighting is
-$U_O(F; \sigma^*) = \sum_{s' \in S} u_O(s') \prod_i \sigma_i^*(s'_i)$.
-A subgame perfect equilibrium requires that $\sigma^*$ be a Nash equilibrium
-of the intervention subgame and that
-
-\begin{equation*}
-u_O(SQ) \geq U_O(F; \sigma^*) \iff s_O^* = N.
-\end{equation*}
-
-The opposition fights if and only if the expected return to fighting, given
-equilibrium intervention, exceeds the status quo.  The international
-environment enters the calculus entirely through $\sigma^*$: the anticipated
-behavior of outside powers can make the difference between peace and war
-before a single shot is fired.  This is the shadow of intervention
-\citep{cetinyan2002}.\footnote{%
-  Whether $\sigma^*$ approximates the expectations that rebels actually form
-  is not merely assumed.  Under rational expectations, agents exploit
-  available information at least as well as the researcher's model
-  \citep{muth1961}.  The Stage~1 classifier described in Section~\ref{sec:constructing}
-  recovers a substantial share of the predictive content in realized
-  intervention outcomes using only publicly observable state
-  characteristics; rebels who can also draw on private intelligence,
-  direct patron relationships, and local knowledge face a forecasting
-  problem that is easier, not harder, than the one the classifier solves.}
-
-\subsection{From Equilibrium to Empirics}
-
-The equilibrium condition is theoretically exact but empirically intractable
-as stated.  With up to 193 potential interveners each choosing among three
-options, the expectation over $U_O$ runs over $3^{192}$ profiles---larger
-than the number of elementary particles in the observable universe.  Two
-assumptions reduce the problem to a tractable form without discarding its
-theoretical content.
-
-\textbf{Assumption 1 (Separability).}  The opposition's payoff from any profile
-is additive across interveners:
-$u_O(s') = \sum_i u_O^i(s'_i)$, where $u_O^i : \{O, N, G\} \rightarrow \mathbb{R}$
-measures the marginal contribution of intervener $i$'s action.
-
-Separability captures a specific and substantively defensible theory of how
-opposition groups aggregate international expectations: each outside power's
-likely behavior enters the calculus independently, and the combined effect
-is their sum.  A rebel coalition assessing its international environment in
-1970s Angola had a view about what Cuba would likely do, a separate view
-about South Africa, and a separate view about the United States; the
-hypothesis is that these entered additively.  The assumption rules out
-complementarities---the value of Soviet logistics may depend on whether
-Cuban troops are also present---but coordinated multilateral operations
-constitute a small minority of actual interventions.\footnote{%
-  \citet{aydinregan2011} find that the \textit{alignment} among interveners matters for
-  civil war duration: same-side interventions shorten wars only when the
-  intervening states share similar preferences.  This is evidence of
-  complementarities in the conduct phase.  Separability here pertains to
-  the onset calculus---the rebel's assessment of the intervention
-  environment at the moment it decides whether to fight---not to the
-  downstream interactions among interveners once fighting begins.  The
-  spatial lags in the Stage~1 classifier (Section~\ref{sec:constructing}) capture
-  interdependence among interveners' \textit{choices} without requiring that
-  their \textit{effects} on the rebel enter non-additively.}
-
-Separability also enables the extension to the full system of potential
-interveners.  Because each state's contribution enters Equation~\eqref{eq:EU} additively,
-computing the opposition's expected utility requires only the marginal
-intervention probabilities $\sigma_i$---not the joint distribution over all
-$n$ players' actions simultaneously.  Specifying and estimating the full
-joint game---the approach of \citet{gibilisco2022} for the
-five permanent Security Council members---becomes computationally
-intractable beyond a small player set.  Separability sidesteps that
-constraint while preserving the game's central implication: the equilibrium
-strategies of outside powers must be mutually consistent.  That consistency
-requirement is enforced directly via the Nash fixed-point iteration
-described in Section~\ref{sec:constructing}.
-
-\textbf{Assumption 2 (Non-intervention as reference).}  For all $i$,
-$u_O^i(N) = 0$.  This normalization makes the intervention-free onset
-model a limiting case: if no state intervenes, the expected utility of
-fighting reduces to purely domestic considerations, and the standard
-country-year onset model follows directly.
-
-Under these two assumptions, the expected utility of fighting simplifies to
-
+That structure shows what a study of onset must measure.  The value of fighting
+is built from two ingredients---who is expected to intervene, and how much each
+intervention would matter.  Under two simplifying assumptions---that
+interveners' contributions enter additively, and that a state expected to stand
+aside adds nothing---it is a weighted sum over the full roster of potential
+interveners,
 \begin{equation}
-U_O(F; \sigma) = \sum_{i=1}^{n} \left[\sigma_i(O)\, u_O^i(O) + \sigma_i(G)\, u_O^i(G)\right].
+U_O(F; \sigma) = \sum_{i=1}^{n} \left[\sigma_i(O)\, u_O^i(O) + \sigma_i(G)\, u_O^i(G)\right],
 \label{eq:EU}
 \end{equation}
-
-Equation~\eqref{eq:EU} is the primary theoretical object, and the two-stage empirical design
-follows directly from its structure.  The equation contains two types of
-unknowns: the intervention probabilities $\sigma_i(O)$ and $\sigma_i(G)$,
-and the marginal utilities $u_O^i(O)$ and $u_O^i(G)$ that scale each.
-Stage~1 (Section~\ref{sec:constructing}) estimates the probabilities for every directed
-dyad using a machine-learning classifier trained on the Regan intervention
-record.  Stage~2 (Section~\ref{sec:decision}) recovers the utility parameters from their
-aggregate effect on civil war onset.  The theory does not merely motivate
-the empirical strategy; it specifies exactly what each stage must estimate
-and how the estimates connect.
-
-The model assigns the strategic decision to the opposition, not because
-governments are passive but because this is where the onset decision
-sits---following the literature's longstanding focus on the conditions that
-facilitate or inhibit insurgency \citep{fearon2003}.  Governmental behavior enters
-implicitly through the opposition's status quo utility and the host-country
-features in the Stage~1 classifier; endogenizing the government's response
-would require a bargaining game that severs the tight deductive connection
-between Equation~\eqref{eq:EU} and its empirical counterpart.
+one term for each of the two unknowns.  The intervention probabilities
+$\sigma_i$ are a prediction problem---for every potential intervener, the
+probability and direction of its involvement---and the work of
+Section~\ref{sec:constructing}, where flexible, data-driven methods earn their
+place.  The utility weights $u_O^i$ are recoverable only from the onset
+behavior the expectations are meant to explain, and are estimated in
+Section~\ref{sec:decision}.  The measure is built in the first stage; its
+bearing on onset---and with it, the standing of the mechanisms---is read in
+the second.

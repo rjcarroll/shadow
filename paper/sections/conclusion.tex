@@ -7,120 +7,117 @@
 Civil war does not begin in a vacuum.  Opposition groups weigh the
 prospect of outside military assistance against the threat of
 international resistance before they decide to fight.  I have argued
-that these anticipatory calculations---the shadow of intervention---are
-a systematic cause of civil war onset, and I have developed a
-theory, a measure, and an empirical test to support this claim.
+that these anticipatory calculations---the shadow of intervention---
+systematically shape the decision to fight, and I have developed a theory,
+a measure, and an evidentiary case for that claim.
 
-The theoretical framework models the opposition group's onset decision
-as a function of rational expectations over the intervention choices of
-up to $n$ potential outside powers.  Under two simplifying assumptions,
-the expected utility of fighting reduces to a weighted sum of
-intervener-specific probabilities and utilities---a quantity that is both
-theoretically interpretable and empirically tractable.  The framework
-generalizes prior work by addressing both government- and
-opposition-biased intervention, by modeling the full set of potential
-state interveners rather than superpowers alone, and by allowing for
-strategic interdependence among interveners through a spatial weighting
-scheme.
+The theoretical framework embeds the onset decision in a bargain fought in
+the shadow of up to $n$ potential outside powers.  Three
+assumptions---separability across interveners, non-intervention as the
+reference point, and a contest--burden decomposition of the war
+value---reduce the opposition's calculus to a weighted sum of
+intervener-specific probabilities, moving on two axes: the net tilt of the
+anticipated environment and its intensity.  Worked under the common
+bargaining frictions, the model signs the axes and the government channel,
+declines to sign the raw opposition channel, and fixes what the evidence can
+discriminate: intensity deters in every costly-war bargain, while an
+emboldening tilt requires limited commitment or divergent expectations.  The
+estimates then lean against the screening account as written and toward
+commitment and divergent expectations, without deciding between the two.
+The framework generalizes prior work by treating both directions of
+intervention, the full population of potential interveners, and their
+strategic interdependence.
 
-Operationalizing this framework required constructing a measure of
-intervention expectations that did not yet exist.  The Stage~1 classifier
-draws on a rich directed-dyad feature set---state capabilities, regime
-type, bilateral relationships, foreign policy alignment, host-country
-characteristics, and spatial context---to produce calibrated probability
-estimates for each potential intervener in each civil war onset year.
-Multiple imputation across 25 complete datasets propagates uncertainty
-from both the country-year and undirected-dyad imputation stages through
-to the final model estimates.
+Operationalizing this framework required constructing a measure that did
+not yet exist.  The Stage~1 classifier turns a rich directed-dyad feature
+set into calibrated intervention probabilities for every potential
+intervener, and multiple imputation across 25 complete datasets carries
+measurement uncertainty through to the final estimates.
 
-The onset analysis delivers three principal findings.  First, the two
-shadow variables are jointly significant ($p < 0.001$) and enter with
-the signs the theory requires.  Expected government-biased intervention
-enters negatively ($\gamma^G = -1.62$): the prospect of outside support
-for the incumbent deters onset.  Expected opposition-biased intervention
-enters positively ($\gamma^O = +0.64$): the prospect of outside support
-for rebels encourages fighting.  The two variables are correlated at
-$r = 0.94$---countries that attract one type of intervention expectation
-attract both---so measurement-corrected individual confidence intervals
-are wide, but the directional separation holds in every one of the 25
-measurement draws, all ten specifications, and the country fixed-effects
-estimator.  The shadow subsumes both the Lake security hierarchy
-\citep{cunningham2016} and the \citet{gibilisco2022} structural P5
-estimates: neither adds explanatory power once the shadow variables are
-included.  Second, the shadow variables carry genuine predictive content
-that survives out-of-sample validation.  Eight of the ten specifications
-achieve positive out-of-sample proportional reduction in log-loss under
-leave-one-onset-group-out cross-validation, with the strongest gains from
-type-disaggregated specifications---Powers, Neighbors, Rivals~(bin), and
-Rivals~(cts) all exceed the aggregate Entrants model---and out-of-sample
-AUC rises from 0.650 (Baseline) to 0.712 (Rivals~(cts)); the in-sample
-PRL rises from 10.1\% to 11.9\% and AUC from 0.771 to 0.787.
+The onset analysis returns three findings.  First, the shadow predicts.  Added
+to a structural onset model, the two aggregate shadow variables improve
+out-of-sample precision under leave-one-country-out cross-validation---modestly
+on their own (the area under the precision--recall curve rises from
+\OosBaseAucpr\ to \OosEntAucpr) and to more than double the baseline once the
+shadow is resolved by intervener type (to \OosFullAucpr)---and by out-of-sample
+drop-column
+importance the shadow is the model's single most valuable component, above every
+structural covariate.  It also subsumes the existing proxies for anticipated
+intervention: neither the Lake security hierarchy \citep{cunningham2016} nor the
+\citet{gibilisco2022} structural estimates adds predictive content once the
+shadow is included.  Second, the shadow enters onset along the two directions on
+which the mechanisms disagree: onset falls with the overall intensity of
+expectations in every measurement draw and rises with the net tilt toward the
+opposition in a clear majority---the two axes the collinear channels
+($r \approx \CorrEgEo$) leave identified.  The pattern leans away from the standard
+common-prior screen and toward limited commitment or divergent expectations,
+without deciding between them; the government-biased channel, on which contest
+and burden agree, is the unambiguously deterrent one.  Third, the opposition
+effect, weak as a single summed expectation, is concentrated in particular
+interveners and reverses sign across them: opposition backing by a neighbor or a
+rival emboldens, while backing by a major power deters---a reversal I do not
+press to explain here.  The undifferentiated measure was averaging these
+offsetting effects away.
 
-The directional separation is not merely an empirical regularity of this
-particular analysis; it is grounded in a complementary literature on
-civil war outcomes.  \citet{thyne2006} provides direct
-evidence that both governments and opposition groups incorporate
-expectations of external support into their prewar decisions, with cheap
-interstate signals---day-to-day diplomatic events that shift perceived
-intervention probabilities---substantially affecting onset.
-\citet{sullivankarreth2014} show that pro-rebel intervention
-raises the probability of rebel victory by roughly 40 percentage points
-unconditionally, while pro-government intervention improves government
-prospects only when rebels are militarily strong.
-\citet{dudley2024} finds a parallel asymmetry in negotiations:
-rebel-biased intervention increases the probability of talks by
-approximately 60 percentage points, while government-biased intervention
-reduces it.  Forward-looking rebels who anticipate these asymmetric
-downstream effects should respond very differently to $E^G$ and $E^O$,
-making the directional distinction theoretically necessary rather than
-merely a descriptive refinement.
+The results carry implications beyond the civil war literature.  The
+two-stage strategy introduced here---predict the probabilities of downstream
+actions, then use those predictions as regressors in a model of the
+initiating decision---applies wherever a strategic choice is made in
+anticipation of others' responses.  Within the civil war literature, it
+supplies what the macro-correlates framework cannot: intervention
+expectations shift with the decisions of specific leaders and
+governments---year to year, conflict to conflict---and so carry the temporal
+variation that slow-moving structural risk factors lack.
 
-The results carry implications beyond the civil war literature.  Many
-political decisions are made in the shadow of anticipated multiparty
-responses: party platforms are staked out in anticipation of rivals'
-reactions; bilateral agreements are struck with an eye to market
-responses; leaders calibrate repression partly on expectations about
-international condemnation or support.  The two-stage empirical strategy
-introduced here---predict the probabilities of downstream actions, then
-use those predictions as regressors in a structural model of the
-initiating decision---is applicable wherever a strategic choice is made
-in anticipation of others' responses.  Within the civil war literature,
-the approach addresses a persistent limitation of the macro-correlates
-framework: country-level structural risk factors evolve slowly and
-cannot explain the timing of onset within already-risky countries.
-Intervention expectations shift with the decisions of specific leaders
-and governments---year to year, conflict to conflict---providing the
-temporal variation that structural factors cannot.
-
-The paper's two-stage design also speaks to a productive debate about the
-appropriate role of machine learning in quantitative political science.
-\citet{grimmerrobertsstewart2021} distinguish four tasks---discovery,
-measurement, causal inference, and prediction---each demanding different
-methods and evaluation criteria; the cardinal sin is conflating prediction
-with inference.  The present design instantiates their prescription: Stage~1
-is measurement (agnostic ensemble, evaluated by PRL and AUC), Stage~2 is
-causal inference (parametric model, identification assumptions, corrected
-standard errors).  \citet{moruccispirling2024} sharpen the point
-further: in curated political science data, complex models rarely outperform
-logistic regression because researchers select variables guided by theory,
-stripping out the nonlinear structure ML exploits.  ML earns its keep in
-\textit{measurement} tasks where the feature space is broad and uncurated---exactly
-the Stage~1 setting, where the 12-percentage-point PRL gap between the
-ensemble and the best single logistic specification confirms exploitable nonlinear
-structure.  Stage~2, by contrast, uses the same five to ten covariates the
-onset literature has relied on for decades; logistic regression suffices
-because the feature set was designed for it.
-\citet{montgomeryolivella2018} advocate tree ensembles for
-prediction when the data-generating process is unknown; their propensity-score
-illustration is structurally analogous to the present two-stage design, with
-flexible ML first-stage weights feeding a parametric second-stage model.
-\citet{knoxlucascho2022} close the loop: once the proxy is
-learned, the remaining challenge is to propagate measurement-stage uncertainty
-into inference and to verify that the proxy's imperfections do not distort
-the directional conclusions.  Under their ``average monotonicity'' condition
+The design also speaks to the debate over machine learning's place in
+quantitative political science.  \citet{grimmerrobertsstewart2021}
+distinguish measurement from causal inference and name their conflation the
+cardinal sin; the two stages here keep them apart---an agnostic ensemble
+evaluated on predictive criteria, then a parametric onset model carrying the
+inferential weight.  \citet{knoxlucascho2022} close the loop: once a proxy
+is learned, its uncertainty must be propagated and its imperfections shown
+not to distort conclusions.  Under their ``average monotonicity'' condition
 (\S3.1)---more of the true concept implies more of the proxy, which the
-Stage~1 calibration verifies empirically---the signs of $\gamma^G < 0$ and
-$\gamma^O > 0$ are valid even if the magnitudes are attenuated.
+Stage~1 calibration verifies---the estimated signs of the tilt and intensity
+effects are valid even if the magnitudes are attenuated.
+
+The two stages also return opposite verdicts on flexibility: the agnostic
+ensemble wins Stage~1, where tens of thousands of dyad-years and
+near-deterministic exclusion zones present exactly the jagged,
+interaction-heavy mapping tree-based learners are built for
+\citep{montgomeryolivella2018}, while the theory-shaped logit wins Stage~2,
+where onsets are rare, the index is the theory's, and flexibility buys
+variance with nothing left to find.  The division is the lesson: flexibility
+earns its keep where data are plentiful and the truth is jagged; structure,
+where events are rare and the theory supplies the functional form.
+
+One limitation is worth stating plainly.  The analysis rests on the
+Correlates of War civil war universe, the \citet{regan2000} intervention data,
+and an onset specification in the \citet{fearon2003} tradition---sources that
+were standard when much of this literature was built but are now dated relative
+to the UCDP/PRIO Armed Conflict Dataset \citep{gleditsch2002} that anchors
+contemporary civil war research.  The ACD covers a broader conflict universe
+and a more recent period, and its External Support Dataset \citep{meier2023}
+codes third-party involvement at a finer, actor-level granularity than the
+interstate intervention record used here.  The
+measurement strategy this paper develops is not tied to these particular
+sources; the estimates it produces are.
+
+Extending the approach to that data universe is a natural next step, and the
+two-stage design ports directly.  Stage~1 would train the same super-learner on
+ACD onset dyads, drawing intervention labels from the External Support
+Dataset---whose disaggregation by support type (troops, materiel, sanctuary,
+funding) would permit a richer shadow: the anticipated \textit{forms} of
+involvement, not only its bias.  The Nash fixed point and the country-year aggregation carry
+over unchanged; Stage~2 would regress a contemporary onset specification on the
+resulting expectations, in place of the \citet{fearon2003}-style model used
+here.  Two features of the ACD would sharpen the exercise: its lower
+battle-death threshold admits many smaller conflicts in which intervention is
+rarer, placing a premium on rare-event metrics; and its
+currency through the 2010s and 2020s would bring the Syrian, Libyan, Sahelian,
+and Ukrainian intervention environments within reach.  I leave this to future
+work.
+
 Whether anticipated intervention shapes the decision to fight is a substantive
 question; that it can be measured---at scale, across time, and across the full
 population of potential outside powers---is the prior claim on which the
