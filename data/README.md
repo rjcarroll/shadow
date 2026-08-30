@@ -27,7 +27,8 @@ tracked. Run notebooks 01--04 to regenerate.
 
 ### Post-1999 interventions — hand-coded, 2000--2014
 - **File:** `data/raw/regan/post1999_interventions.csv`
-- **Notes:** 37 intervention records (25 gov, 12 opp) across 15 host countries.
+- **Notes:** 32 intervention records (22 gov, 10 opp) across 14 host countries
+  (verified against appendix `tab:post1999` by `scripts/verify_post1999_table.py`).
   Coded by the author using the same criteria as Regan: state must deploy
   personnel (troops/advisors/proxies), must be attributable to a specific COW
   state, must be directed at one side. UN peacekeeping excluded. See comments
