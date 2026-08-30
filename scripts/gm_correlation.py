@@ -171,11 +171,11 @@ def main():
     print("-" * 70)
 
     # E_gov + E_opp (total intervention exposure) vs G&M total
-    if "E_gov_trim" in merged.columns:
-        merged["E_total_trim"] = merged["E_gov_trim"] + merged["E_opp_trim"]
+    if "E_gov" in merged.columns:
+        merged["E_total"] = merged["E_gov"] + merged["E_opp"]
         results.append(correlate(
-            merged["E_total_trim"].values, merged["total_P5"].values,
-            "E_total_trim (shadow)", "total_P5 (G&M)"))
+            merged["E_total"].values, merged["total_P5"].values,
+            "E_total (shadow)", "total_P5 (G&M)"))
 
     if "E_gov" in merged.columns:
         merged["E_total"] = merged["E_gov"] + merged["E_opp"]
@@ -188,17 +188,17 @@ def main():
     print("2. P5-specific intervention exposure")
     print("-" * 70)
 
-    if "E_P5_gov_trim" in merged.columns:
-        merged["E_P5_total_trim"] = merged["E_P5_gov_trim"] + merged["E_P5_opp_trim"]
+    if "E_P5_gov" in merged.columns:
+        merged["E_P5_total"] = merged["E_P5_gov"] + merged["E_P5_opp"]
         results.append(correlate(
-            merged["E_P5_total_trim"].values, merged["total_P5"].values,
-            "E_P5_total_trim (shadow)", "total_P5 (G&M)"))
+            merged["E_P5_total"].values, merged["total_P5"].values,
+            "E_P5_total (shadow)", "total_P5 (G&M)"))
 
-    if "E_major_gov_trim" in merged.columns:
-        merged["E_major_total_trim"] = merged["E_major_gov_trim"] + merged["E_major_opp_trim"]
+    if "E_major_gov" in merged.columns:
+        merged["E_major_total"] = merged["E_major_gov"] + merged["E_major_opp"]
         results.append(correlate(
-            merged["E_major_total_trim"].values, merged["total_P5"].values,
-            "E_major_total_trim (shadow)", "total_P5 (G&M)"))
+            merged["E_major_total"].values, merged["total_P5"].values,
+            "E_major_total (shadow)", "total_P5 (G&M)"))
 
     # ── 3. Direction-specific: gov vs opp ─────────────────────────────────
     print("\n" + "-" * 70)
@@ -207,41 +207,41 @@ def main():
 
     # G&M's "direction" robustness (if available from separate CSV)
     # For now, correlate shadow gov/opp separately with total G&M
-    if "E_P5_gov_trim" in merged.columns:
+    if "E_P5_gov" in merged.columns:
         results.append(correlate(
-            merged["E_P5_gov_trim"].values, merged["western"].values,
-            "E_P5_gov_trim (shadow)", "western_P5 (G&M)"))
+            merged["E_P5_gov"].values, merged["western"].values,
+            "E_P5_gov (shadow)", "western_P5 (G&M)"))
         results.append(correlate(
-            merged["E_P5_opp_trim"].values, merged["eastern"].values,
-            "E_P5_opp_trim (shadow)", "eastern_P5 (G&M)"))
+            merged["E_P5_opp"].values, merged["eastern"].values,
+            "E_P5_opp (shadow)", "eastern_P5 (G&M)"))
 
     # ── 4. Shadow vs G&M peace counterfactuals ─────────────────────────────
     print("\n" + "-" * 70)
     print("4. Shadow measure vs G&M peace probability")
     print("-" * 70)
 
-    if "E_gov_trim_asinh" in merged.columns and "data" in merged.columns:
+    if "E_gov_asinh" in merged.columns and "data" in merged.columns:
         results.append(correlate(
-            merged["E_gov_trim_asinh"].values, merged["data"].values,
-            "E_gov_trim_asinh (shadow)", "Pr(peace|data) (G&M)"))
+            merged["E_gov_asinh"].values, merged["data"].values,
+            "E_gov_asinh (shadow)", "Pr(peace|data) (G&M)"))
         results.append(correlate(
-            merged["E_total_trim"].values, merged["effect_allInt"].values,
-            "E_total_trim (shadow)", "effect_allInt (G&M)"))
+            merged["E_total"].values, merged["effect_allInt"].values,
+            "E_total (shadow)", "effect_allInt (G&M)"))
 
     # ── 5. Shadow vs Lake hierarchy ────────────────────────────────────────
     print("\n" + "-" * 70)
     print("5. Shadow measure vs Lake (2009) U.S. security hierarchy")
     print("-" * 70)
 
-    if "E_gov_trim" in merged.columns:
+    if "E_gov" in merged.columns:
         results.append(correlate(
-            merged["E_gov_trim"].values, merged["lake_hierarchy"].values,
-            "E_gov_trim (shadow)", "Lake hierarchy"))
+            merged["E_gov"].values, merged["lake_hierarchy"].values,
+            "E_gov (shadow)", "Lake hierarchy"))
 
-    if "E_P5_gov_trim" in merged.columns:
+    if "E_P5_gov" in merged.columns:
         results.append(correlate(
-            merged["E_P5_gov_trim"].values, merged["lake_hierarchy"].values,
-            "E_P5_gov_trim (shadow)", "Lake hierarchy"))
+            merged["E_P5_gov"].values, merged["lake_hierarchy"].values,
+            "E_P5_gov (shadow)", "Lake hierarchy"))
 
     # G&M's US probability vs Lake (replicating their Fig 1 right panel)
     results.append(correlate(

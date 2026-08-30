@@ -28,7 +28,7 @@ FE_TIME_VARS = [
     "polity2_lag", "lgdp_lag", "lpop_lag",
     "nwstate", "instab_lag", "prior_war", "year",
 ]
-SHADOW_VARS = ["E_gov_trim_asinh", "E_opp_trim_asinh"]
+SHADOW_VARS = ["E_gov_asinh", "E_opp_asinh"]
 fe_covars = FE_TIME_VARS + SHADOW_VARS
 
 

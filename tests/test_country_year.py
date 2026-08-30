@@ -181,14 +181,26 @@ def test_imputed_files_exist():
 
 
 def test_imputed_no_missing():
-    """Imputed files should have no missing values in numeric columns."""
+    """Imputed files should have no missing values in numeric columns.
+
+    Exception: `recent_int` is a pass-through observable built from Regan
+    (2000), whose coverage ends in 1999; it is NaN post-1999 by design
+    (see notebook 01) and is excluded from imputation.  It must still be
+    fully observed within Regan coverage.
+    """
     for i in range(1, 6):
         path = INTERIM / f"cy_imputed_{i}.parquet"
         if not path.exists():
             pytest.skip(f"cy_imputed_{i}.parquet not found")
         imp = pd.read_parquet(path)
         num = imp.select_dtypes(include=np.number)
-        missing = num.isna().sum().sum()
+        missing = num.drop(columns=["recent_int"], errors="ignore").isna().sum().sum()
         assert missing == 0, (
             f"cy_imputed_{i}.parquet has {missing} missing numeric values"
         )
+        if "recent_int" in num.columns:
+            stray = num.loc[imp["year"] <= 1999, "recent_int"].isna().sum()
+            assert stray == 0, (
+                f"cy_imputed_{i}.parquet: {stray} recent_int NaNs within "
+                "Regan coverage (<= 1999)"
+            )

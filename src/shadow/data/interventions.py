@@ -288,8 +288,18 @@ def code_interventions(dd: pd.DataFrame, int_table: pd.DataFrame) -> pd.DataFram
 
     # Map target onto onset rows; default 0 (no intervention).
     if len(matched) > 0:
-        # Multiple intervention years may hit the same onset row; take first
-        # (consistent with R's loop over arrange(ddyear)-sorted int table).
+        # Bug 2 fix: a host with two onsets close together (e.g., Libya 2011 &
+        # 2014) would otherwise have a single intervention land inside both
+        # windows. Assign each intervention record (ccode_A, ccode_B, year_int)
+        # to its SINGLE nearest onset, so it cannot bleed into a second onset.
+        matched['dist'] = (matched['year'] - matched['year_int']).abs()
+        matched = (
+            matched.sort_values(['ccode_A', 'ccode_B', 'year_int', 'dist', 'year'])
+            .groupby(['ccode_A', 'ccode_B', 'year_int'], sort=False)
+            .first()
+            .reset_index()
+        )
+        # Each onset row then takes the first target assigned to it.
         matched = matched.sort_values(['ddyear', 'year_int'])
         best = matched.groupby('ddyear', sort=False)['target'].first()
         intervention = onset['ddyear'].map(best).fillna(0).astype(int)

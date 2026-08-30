@@ -20,12 +20,15 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 # Non-independent / colonial / dependent entities — always dropped.
 # These codes appear in some source data but are never valid COW members.
+# (Qatar, 694, was removed from this list on 2026-06-17: it is a valid COW
+#  member that does intervene — e.g., Libya 2011 — and so must remain a
+#  candidate intervener and country in the panel.)
 # ---------------------------------------------------------------------------
 _ALWAYS_DROP: frozenset[str] = frozenset({
     "031", "053", "054", "055", "056", "057", "058",
     "060", "080", "115", "212", "221", "223", "232",
     "331", "338", "395", "402", "403", "411", "511",
-    "581", "591", "694", "781", "835", "935", "940",
+    "581", "591", "781", "835", "935", "940",
     "946", "955", "970", "983", "986", "987", "990",
 })
 
