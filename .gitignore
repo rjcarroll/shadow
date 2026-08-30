@@ -64,3 +64,5 @@ replication/
 notes/
 logs/
 data/archive/
+
+.quarto/

@@ -30,7 +30,8 @@ This project constructs a measure of expected intervention that covers all
 ~190 potential interveners, varies annually with shifting alliances and
 capabilities, and distinguishes government-biased from opposition-biased
 intervention. The measure is then used to test whether the shadow actually
-deters and emboldens.
+deters and emboldens. The resulting paper is conditionally accepted at
+*Political Science Research and Methods*.
 
 ## Pipeline architecture
 
@@ -44,14 +45,15 @@ Raw data (COW, V-Dem, UNGA, trade, alliances, ...)
 Multiple imputation (miceforest, 5 CY × 5 UD = 25 datasets)
     │
     ▼
-105 directed-dyad-year features
+109 directed-dyad-year features (97 base + 12 spatial)
     │
     ▼
 ┌─────────────────────────────────────────────────┐
 │  STAGE 1: Super-learner ensemble                │
 │                                                 │
-│  9 classifiers (RF, 2×HGB, ridge, elastic-net,  │
-│  lasso, multinomial logit, 2×MLP) → 10-fold CV  │
+│  9 learners (RF, 2×HGB, ridge, elastic-net,     │
+│  lasso, multinomial logit, 2×MLP) × 3 feature   │
+│  sets = 27 candidates → 10-fold CV              │
 │  → NNLS stacking on multinomial log-loss         │
 │                                                 │
 │  Spatial lags ←──── Nash fixed-point iteration   │
@@ -124,7 +126,8 @@ covers a different time span.
 war host, state $B$ the potential intervener. This doubles many features
 (GDP of $A$ vs GDP of $B$, regime type of $A$ vs regime type of $B$) and
 adds asymmetric quantities like the capability ratio $B/A$. The final
-feature matrix has **105 columns** per directed-dyad-year observation.
+feature matrix has **109 columns** per directed-dyad-year observation:
+97 base features plus 12 spatial lags.
 
 ### Staged imputation
 
@@ -150,13 +153,12 @@ staging matters:
    into two directed rows $(A \to B)$ and $(B \to A)$, with features
    assigned by role. No imputation here---just reshaping.
 
-The result is 25 complete directed-dyad-year datasets, each around 25,700
-rows × 105 features, stored as parquet files (~92 MB each for the spatial
-weight matrices, smaller for the feature tables).
+The result is 25 complete directed-dyad-year datasets, stored as parquet
+throughout.
 
 ### Spatial weight matrices
 
-Ten spatial lag features capture the strategic context: what are other
+Twelve spatial-lag features capture the strategic context: what are other
 potential interveners doing in the same host country? These are weighted
 averages across all states $C \neq B$ of their intervention behavior toward
 $A$, using a polity-similarity weight matrix (states with similar regime
@@ -171,32 +173,28 @@ structure.
 
 ## Stage 1 results
 
-The ensemble achieves a **proportional reduction in log-loss (PRL) of 47.3%**
-and an AUC of 0.969 on out-of-fold predictions. For a three-class
-rare-event problem where interventions account for ~1% of observations,
-this is substantial.
+The ensemble achieves a **proportional reduction in log-loss (PRL) of
+39.6%** and a ROC-AUC of 0.958 on out-of-fold predictions, for a
+three-class rare-event problem where interventions account for ~0.8% of
+observations. Average precision tells the sharper story: AUC-PR reaches
+0.32 for any intervention (0.22 government-biased, 0.25
+opposition-biased) against a no-skill baseline near 0.01 --- the
+classifier earns its keep by finding needles, which matters, because
+sending all intervention probabilities to zero is exactly what a standard
+onset model without shadow variables already does.
 
-**Where does the performance come from?** Decomposing the log-loss
-reduction by true class reveals that **94% of the PRL comes from the 1% of
-observations where intervention actually occurred**. Only 6% comes from
-improved calibration of non-events. The classifier earns its keep by
-finding needles, not by calibrating hay---which matters, because sending
-all intervention probabilities to zero is exactly what a standard onset
-model without shadow variables already does.
+**Ensemble weights** (NNLS, averaged across the 25 draws) concentrate on
+the nonlinear learners: the random forest leads at 53%, the deep MLP takes
+20%, and the multinomial logit --- the softmax best-response function
+assumed by structural game-theoretic models --- earns 7%. The ensemble's
+edge over the best purely logistic candidate is **8.7 points of PRL**: the
+nonlinear advantage that motivates learning the proxy rather than
+specifying it.
 
-**Ensemble weights** (averaged across 25 imputation draws):
-
-| Classifier | Weight |
-|:-----------|-------:|
-| Deep MLP (100, 50) | 44.5% |
-| Random forest | 38.6% |
-| Histogram-based GBM (low LR) | 11.1% |
-| Histogram-based GBM | 3.7% |
-| All others | <2.1% |
-
-The multinomial logit---which corresponds to the softmax best-response
-function assumed by structural game-theoretic models---earns about 0.4% of
-the weight. The data prefer nonparametric alternatives.
+The 27 candidates also span three feature sets --- base features only (X),
+spatial lags only (W), and both (XW) --- and the stacker spreads real
+weight across them (57% / 5% / 38%): the strategic-context features carry
+signal beyond the monadic and dyadic fundamentals.
 
 ## The shadow measure
 
@@ -213,33 +211,41 @@ experiences no civil war in our data---provides a pure out-of-sample check:
 the shadow tracks the Six Day War, the Soviet expulsion, and the Gulf War
 purely from counterfactual predictions.
 
+Against the two existing proxies, the measure correlates sensibly while
+covering far more of the world: $r = 0.29$ with the Lake security-hierarchy
+measure ($n = 162$) and $r = 0.47$ with the Gibilisco--Montero structural
+P5 intervention probabilities ($n = 146$) --- related, but far from
+redundant.
+
 ## Stage 2: Does the shadow predict onset?
 
-The onset logit asks whether expected intervention enters the civil war
-calculus as theory predicts.
+Prediction gates everything. Under leave-one-country-out
+cross-validation, adding the shadow pair to a standard onset baseline
+raises out-of-sample AUC-PR from 0.057 to 0.074; resolving the shadow by
+intervener type raises it to 0.143 --- two and a half times the baseline.
+The measure earns its place in the onset model before any coefficient is
+read.
 
-| | Coefficient | T×P SE | 95% CI |
-|:--|--:|--:|:--|
-| $E^G$ (gov-biased) | −1.62 | 1.37 | [−4.63, +0.69] |
-| $E^O$ (opp-biased) | +0.64 | 1.10 | [−1.94, +2.59] |
-
-The signs are as predicted: government-biased intervention expectations
-**deter** onset; opposition-biased expectations **embolden** it. The
-confidence intervals are wide---by design.
+Reading direction takes more care. The two channels are nearly collinear
+($r \approx 0.94$), so their individual coefficients swing from
+measurement draw to measurement draw and cannot be trusted. What the data
+can speak to is the pair's two axes: a **common intensity** ($E^O + E^G$
+--- deeper into the shadow of both kinds of intervention at once) and a
+**net tilt** ($E^O - E^G$ --- the balance shifting toward one side).
+Those are precisely the coordinates of the theory's two-axis predictions,
+and the estimates behave accordingly: government-biased expectations
+deter consistently across draws, while the raw opposition channel is left
+unsigned by the theory itself --- a race between the better odds outside
+backing brings and the heavier war it portends.
 
 ### Honest uncertainty
 
-The T×P bootstrap propagates measurement-stage uncertainty (variation
-across the 25 imputation draws) into the standard errors. This inflates SEs
-by a factor of 3.5× ($E^G$) and 2.9× ($E^O$) relative to naive
-maximum-likelihood estimates. Variance decomposition shows **92% of total
-uncertainty in $E^G$ is measurement-stage** (88% for $E^O$), not sampling
-noise. In other words: the dominant source of uncertainty isn't "do we have
-enough civil wars?"---it's "how precisely can we measure the shadow?"
-
-This is the contribution. Wide confidence intervals from honest uncertainty
-propagation are more informative than narrow intervals that pretend a
-learned proxy is observed data.
+The T×P bootstrap pools measurement spread (variation across the 25
+imputation draws) and sampling uncertainty into every reported interval,
+and measurement dominates: the binding constraint is not "do we have
+enough civil wars?" but "how precisely can we measure the shadow?" Wide
+intervals from honest propagation are the contribution --- narrow ones
+would pretend a learned proxy is observed data.
 
 ## Technical stack
 
@@ -248,7 +254,8 @@ learned proxy is observed data.
 - **Imputation**: miceforest (multiple imputation by chained equations with random forests)
 - **Data**: pandas, pyarrow/parquet throughout
 - **Paper**: LaTeX
-- **Pipeline**: Jupyter notebooks (01--09), reproducible via nbconvert
+- **Pipeline**: Jupyter notebooks plus a script suite; every reported
+  number and table is generated by `scripts/export_numbers.py`
 
 ## Code
 
@@ -263,7 +270,19 @@ The full pipeline lives in nine notebooks:
 | 05 | Stage 1 training (super-learner, 10-fold CV, Nash fixed-point) |
 | 06 | Stage 1 predictions (universal application + aggregation) |
 | 07 | Stage 2 onset analysis (logit, specifications, T×P bootstrap) |
-| 09 | Figure generation |
+| 09 | Exploratory figures |
 
 Source code for data loading, feature engineering, and model utilities is in
 `src/shadow/`.
+
+Paper exhibits are generated by scripts, not notebooks:
+`scripts/export_numbers.py` writes every reported statistic as a LaTeX
+macro and every table as a generated file, and `scripts/fig_shadow_ts.py`
+and `scripts/fig_appendix.py` produce the figures. The manuscript
+`\input`s these, so the page cannot diverge from the pipeline ---
+verified against the accepted version by byte-identical regeneration and
+a seeded 25-item random audit of reported values (25/25). The extended
+analyses behind the paper's Section 3 (out-of-sample gates, subsumption,
+direction and channels, drop-column importance, predictive-significance
+tests) also live in `scripts/`; the replication package design is in
+`REPLICATION.md`.
