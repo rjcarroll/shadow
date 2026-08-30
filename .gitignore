@@ -66,3 +66,4 @@ logs/
 data/archive/
 
 .quarto/
+replication-*.log
