@@ -67,3 +67,4 @@ data/archive/
 
 .quarto/
 replication-*.log
+package-build/
