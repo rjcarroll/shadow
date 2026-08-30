@@ -13,6 +13,15 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 OUT="${1:-$ROOT/package-build}"
 PKG="$OUT/shadow-replication"
+
+# The package is built from git HEAD; uncommitted changes would silently
+# not ship (this exact mismatch once put a stale requirements file in the
+# zip). Refuse to build from a dirty tree.
+if [ -n "$(git status --porcelain)" ] && [ -z "${ALLOW_DIRTY:-}" ]; then
+  echo "ERROR: uncommitted changes present. The package ships HEAD, not" >&2
+  echo "the working tree — commit first (or set ALLOW_DIRTY=1)." >&2
+  exit 1
+fi
 rm -rf "$PKG"
 mkdir -p "$PKG"
 
