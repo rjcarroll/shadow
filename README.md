@@ -1,40 +1,68 @@
 # Fighting in the Shadow of Intervention: A Learned-Proxy Analysis
 
-Replication archive for "Fighting in the Shadow of Intervention: A Learned-Proxy Analysis."
+Research code for the paper, conditionally accepted at *Political Science
+Research and Methods* (August 2026). A replication package for the PSRM
+Dataverse is in preparation; see [`REPLICATION.md`](REPLICATION.md).
 
-Expectations of third-party military intervention shape the decision to start
-a civil war. This paper builds a learned proxy for those expectations using a
-super-learner ensemble trained on directed-dyad data from 190 civil war onsets
-(1946--2014), then tests whether the resulting measure --- the *shadow of
-intervention* --- predicts civil war onset in a standard logit framework.
-Measurement-stage uncertainty is propagated into the second-stage standard
-errors following Knox, Lucas, and Cho (2022).
+Expectations of third-party military intervention shape the decision to
+start a civil war — but the quantity that matters is an expectation, not a
+realized event, and existing proxies are either static or restricted to the
+P5. This project builds a *learned proxy* for the shadow of intervention in
+two stages. **Stage 1** trains a super-learner ensemble on directed
+dyad-years (1946–2014) to predict the probability and direction
+(government- vs. opposition-biased) of intervention, imposes a Nash
+fixed-point condition so that predictions are self-consistent inputs to
+their own spatial features, and aggregates to country-year shadow measures
+$E^G$ and $E^O$. **Stage 2** asks whether the shadow enters the onset
+calculus as theory predicts, propagating measurement uncertainty through a
+T×P bootstrap and reading direction through a net-tilt / common-intensity
+reparameterization gated by out-of-sample prediction.
 
-For a detailed walkthrough of the pipeline and results, see [`docs/overview.qmd`](docs/overview.qmd).
+This README deliberately reports no statistics. Every number, table, and
+figure in the paper is generated from pipeline outputs (see below); results
+live there, not here, so they cannot drift.
+
+## Exhibits by construction
+
+- [`scripts/export_numbers.py`](scripts/export_numbers.py) is the single
+  source of truth for every reported statistic: it writes
+  `paper/generated/numbers.tex` (one `\newcommand` per in-prose number) and
+  every generated table in `paper/tables/`.
+- [`scripts/fig_shadow_ts.py`](scripts/fig_shadow_ts.py) and
+  [`scripts/fig_appendix.py`](scripts/fig_appendix.py) produce the paper's
+  data figures.
+- The manuscript `\input`s these files, so the page equals the pipeline
+  output by construction. Verified against the accepted manuscript:
+  regeneration is byte-identical, and a seeded 25-item random audit of
+  reported values reproduced 25/25.
 
 ## Repository layout
 
-```
+```text
 src/shadow/         Installable Python package
-  data/               Data construction modules (ccode, country_year, dyad,
+  data/               Data construction (ccode, country_year, dyad,
                         impute, interventions, spatial)
-  models/             Ensemble learner and onset models (ensemble, onset)
+  models/             Ensemble learner and onset models
   utils/              Plotting utilities
-notebooks/          Jupyter notebooks --- one per pipeline stage (see below)
-scripts/            Standalone scripts (bootstrap, batch re-run)
-paper/              LaTeX source for the paper
-  sections/           Section files (introduction, motivation, constructing,
-                        decision, conclusion, appendix)
-  figures/            Generated PDFs
+notebooks/          Pipeline stages 01–07, 09 (see below)
+scripts/            Exhibit generators, out-of-sample gates, direction and
+                      channel analyses, predictive-significance tests,
+                      diagnostics, and batch runners
+paper/              LaTeX source
+  sections/           Section files
+  generated/          numbers.tex — every reported statistic as a macro
+  tables/             Generated booktabs tables
+  figures/            Generated PDFs (+ TikZ sources)
 docs/               Portfolio overview (Quarto)
 data/               Source data (not tracked; see data/README.md)
 tests/              pytest test suite
+REPLICATION.md      Replication package design (PSRM Dataverse)
 ```
 
 ## Setup
 
-Requires Python 3.12+ and libomp (`brew install libomp` on macOS, needed
-by LightGBM/miceforest).
+Requires Python ≥ 3.11 (developed on 3.14) and libomp
+(`brew install libomp` on macOS; needed by LightGBM/miceforest).
 
 ```bash
 python -m venv .venv
@@ -44,55 +72,25 @@ pip install -e ".[dev]"
 
 ## Pipeline
 
-Run the notebooks in order. Each reads from `data/interim/` and writes back
-to it; final outputs go to `data/interim/` (model files, predictions) and
-`paper/figures/` (PDFs).
+Notebooks run in order; each reads from and writes to `data/interim/`.
+Stage-1 training is the heavy step (order of a day or more on a laptop);
+everything else runs in minutes to hours.
 
-| Notebook | Stage | Time |
-|---|---|---|
-| `01-country-year` | Build country-year panel (Polity, NMC, trade, ideal points) with multiple imputation (5 draws) | ~5 min |
-| `02-dyad-data` | Expand to 25 directed-dyad files (5 CY x 5 UD imputations) with alliance, contiguity, DOE, IGO, ethnic, rivalry features | ~45 min |
-| `03-interventions` | Merge Regan (1944--1999) + hand-coded post-1999 interventions; 461 intervention-dyad records | ~1 min |
-| `04-spatial-weights` | Build spatial weight matrices from intervention predictions | ~20 min |
-| `05-stage1-training` | Train super-learner ensemble (9 classifiers, PCA, 10-fold CV, NNLS stacking) x 25 draws | ~35 hrs |
-| `06-stage1-predictions` | Generate shadow measure: aggregate dyad predictions to country-year E_gov / E_opp | ~30 min |
-| `07-stage2-onset` | Onset logit (10 specs), T x P bootstrap (KLC 2022), FE, robustness checks | ~4 hrs |
-| `09-figures` | All paper figures | ~5 min |
+| Notebook | Stage |
+| --- | --- |
+| `01-country-year` | Country-year panel with multiple imputation (5 draws) |
+| `02-dyad-data` | Directed-dyad expansion (5 × 5 = 25 complete datasets) |
+| `03-interventions` | Intervention coding: Regan (1944–1999) + hand-coded post-1999 extension |
+| `04-spatial-weights` | Spatial weight matrices, one per imputation draw |
+| `05-stage1-training` | Super-learner training (9 learners × 3 feature sets per draw, NNLS stacking) |
+| `06-stage1-predictions` | Universal predictions, Nash fixed point, aggregation to $E^G$/$E^O$ |
+| `07-stage2-onset` | Onset models, T×P bootstrap, robustness |
+| `09-figures` | Exploratory figures (paper figures come from `scripts/`) |
 
-For batch re-runs: `caffeinate -i bash scripts/rerun_extended.sh 2>&1 | tee rerun.log`
-
-## Stage 1: Super-learner ensemble
-
-Nine component classifiers spanning three families:
-
-- **Trees:** random forest (500 trees), histogram-gradient boosting (lr=0.10), histogram-gradient boosting (lr=0.05)
-- **Logistic:** ridge, elastic net, LASSO, unpenalized multinomial
-- **Neural:** MLP (25 units), MLP (100, 50 units)
-
-PCA reduces ~105 features to ~50--60 components (90% cumulative variance).
-NNLS stacking combines out-of-fold predictions. Ensemble weights:
-MLP(100,50) ~44.5%, RF ~38.6%, HGB(lr=0.05) ~11.1%.
-
-Out-of-fold performance: PRL 47.3%, AUC 0.969.
-
-## Stage 2: Onset logit with T x P bootstrap
-
-The shadow measure (E_gov, E_opp) enters a country-year onset logit alongside
-polity, instability, GDP, population, and (in richer specifications) entrant
-counts, major-power indicators, and contiguous-neighbor variables. Standard
-errors are corrected for generated-regressor uncertainty by bootstrapping over
-both imputation draws (T=25) and cluster-resampled observations (P=200),
-following Knox, Lucas, and Cho (2022, Section 4.2).
-
-Key results (baseline specification):
-
-| | Coefficient | T×P SE | 95% CI |
-|:--|--:|--:|:--|
-| E_gov (deterrence) | −1.62 | 1.37 | [−4.63, +0.69] |
-| E_opp (emboldening) | +0.64 | 1.10 | [−1.94, +2.59] |
-
-SE inflation relative to naive MLE: 3.5× (E_gov), 2.9× (E_opp). Variance
-decomposition: 92% of uncertainty in E_gov is measurement-stage, not sampling.
+The extended analyses behind Section 3 and the appendix (leave-one-country-out
+gates, subsumption, direction and channels, drop-column importance,
+predictive-significance tests, fixed-point diagnostics) live in `scripts/`,
+with `run_*.sh` batch runners.
 
 ## Tests
 
