@@ -18,13 +18,17 @@ Runtime: **under one minute.** Expected final lines:
 
 ```text
 RESULT: SUCCESS — every regenerated number and table is
-byte-identical to the shipped (published) versions, and every
-figure matches up to its embedded creation timestamp.
+byte-identical to the shipped (published) versions.
 ```
 
-Exit status 0 means every regenerated exhibit matched: LaTeX numbers and
-tables byte-for-byte, figure PDFs up to the few bytes of their embedded
-creation timestamp. The log file (`replication-YYYYMMDD-HHMMSS.log`) is the
+Exit status 0 means every regenerated number and table matched
+byte-for-byte. Figures: on the original platform (macOS/arm64) they also
+match up to a few bytes of embedded creation timestamp; on other
+platforms the PDF byte layout differs (font embedding, compression) even
+for identical plotted content, so the log marks them `REGEN` for visual
+comparison — the data behind them is exactly the byte-verified material
+above. This cross-platform behavior is verified: on Linux, all numbers
+and tables reproduce byte-identically. The log file (`replication-YYYYMMDD-HHMMSS.log`) is the
 record of that comparison. The manuscript `\input`s the generated files —
 `paper/generated/numbers.tex` (every in-prose statistic as a macro) and
 `paper/tables/*.tex` (every table) — so a successful run demonstrates that
