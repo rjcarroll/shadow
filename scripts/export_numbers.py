@@ -256,11 +256,9 @@ _egc.index = _egc.index.astype(int)
 _lk = (pd.read_stata(ROOT / "data/raw/cunningham/cunningham.dta", columns=["ccode", "year", "us_SH1995"])
          .assign(ccode=lambda d: d.ccode.astype(int)).groupby("ccode")["us_SH1995"].mean())
 _L = pd.concat([_egc.rename("E_gov"), _lk], axis=1).dropna()
-import zipfile
-with zipfile.ZipFile(ROOT / "replication/dataverse_files.zip") as _z:
-    with _z.open("Gibilisco_Montero_Intervention/matlab/baseline_model/"
-                 "conditionalInterventionProbs_replication.csv") as _f:
-        _gm = pd.read_csv(_f)
+# Gibilisco & Montero structural P5 probabilities: single CSV extracted
+# from their Dataverse archive (see data/README.md for provenance).
+_gm = pd.read_csv(ROOT / "data/raw/gm/conditionalInterventionProbs_replication.csv")
 _gm5 = (_gm.assign(total_P5=_gm[["US", "UK", "FRN", "RUS", "CHN"]].sum(axis=1),
                    ccode=_gm.ccode.astype(int)).groupby("ccode")["total_P5"].mean())
 _G = pd.concat([_egc.rename("E_gov"), _gm5], axis=1).dropna()

@@ -114,3 +114,4 @@ tracked. Run notebooks 01--04 to regenerate.
 |------|--------|
 | `data/raw/fl/repdata.dta` | Fearon & Laitin (2003) |
 | `data/raw/cunningham/cunningham.dta` | Cunningham (2016) --- US security hierarchy variable |
+| `data/raw/gm/conditionalInterventionProbs_replication.csv` | Gibilisco & Montero (2022, JOP) --- structural P5 conditional intervention probabilities; single file extracted from their Dataverse replication archive (`Gibilisco_Montero_Intervention/matlab/baseline_model/`), used for the convergent-validity correlation |
